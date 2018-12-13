@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ContactDB Explorer</title>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/PLYLoader.js"></script>
+		<script src="js/WebGL.js"></script>
+    <script src="js/TrackballControls.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, renderer, container, controls, dLight, aLight, material, mesh, loader, meshName;
+      var objectName, sessionName, instruction;
+      var datapoints;
+
+			init();
+
+      
+      function updateObjectNames() {
+        // get instruction
+        var instr = document.getElementById("instructions").value;
+
+        // update the object names menu
+        var menu = document.getElementById("objectNames");
+        var prevObjectName = menu.value;
+        menu.options.length = 0;
+        var idxSelected = 0;
+        for (var o in datapoints[instr]) {
+          menu.options[menu.length] = new Option(o, o);
+          if (o == prevObjectName) {
+            idxSelected = menu.length - 1;
+          }
+        }
+        menu.options[idxSelected].selected = true;
+        menu.onchange(menu.value);
+      }
+
+      
+      function updateSessionNames() {
+        // get instruction and object name
+        var instr = document.getElementById("instructions").value;
+        var oName = document.getElementById("objectNames").value;
+
+        // update the session names menu
+        var menu = document.getElementById("sessionNames");
+        var prevSessionName = menu.value;
+        menu.options.length = 0;
+        var idxSelected = 0;
+        var sessionList = datapoints[instr][oName]
+        for (var sIdx=0; sIdx < sessionList.length; sIdx++) {
+          var s = sessionList[sIdx];
+          menu.options[menu.length] = new Option(s, s);
+          if (s == prevSessionName) {
+            idxSelected = menu.length - 1;
+          }
+        }
+        menu.options[idxSelected].selected = true;
+        menu.onchange(menu.value);
+      }
+
+
+      function updateMenus(instructionSelected, objectNameSelected) {
+        if (instructionSelected) {
+          updateObjectNames();
+        } else if (objectNameSelected) {
+          updateSessionNames();
+        }
+      }
+
+
+      function instructionChanged(value) {
+        instruction = value;
+        updateMenus(true, false);
+        updateMesh();
+      }
+      function objectNameChanged(value) {
+        objectName = value;
+        updateMenus(false, true);
+        updateMesh();
+      }
+      function sessionNameChanged(value) {
+        sessionName = value;
+        updateMesh();
+      }
+
+      
+      function updateMesh() {
+        // var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        var newMeshName = './meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        if (newMeshName != meshName) {
+          meshName = newMeshName;
+          loader.load(meshName, onGeometryLoad);
+        }
+      }
+
+
+      function createMenus(jsondata) {
+        datapoints = jsondata;
+
+        iMenu = document.createElement('select');
+        iMenu.id = 'instructions';
+        iMenu.setAttribute('onchange', 'instructionChanged(this.value)');
+        document.body.appendChild(iMenu);
+        
+        oMenu = document.createElement('select');
+        oMenu.id = 'objectNames';
+        oMenu.setAttribute('onchange', 'objectNameChanged(this.value)');
+        document.body.appendChild(oMenu);
+        
+        sMenu = document.createElement('select');
+        sMenu.id = 'sessionNames';
+        sMenu.setAttribute('onchange', 'sessionNameChanged(this.value)');
+        document.body.appendChild(sMenu);
+        
+        for (var instr in datapoints) {
+          iMenu.options[iMenu.length] = new Option(instr);
+        }
+        iMenu.options[0].selected = true;
+        
+        initRender();
+        iMenu.onchange(iMenu.value);
+        animate();
+      }
+
+      
+      function initRender() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 0.6);
+				camera.position.set(0, -0.2, 0.2);
+				var cameraTarget = new THREE.Vector3(0, 0, 0);
+        camera.lookAt(cameraTarget);
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xFFFFFF );
+
+				loader = new THREE.PLYLoader();
+
+				// Lights
+        dLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        dLight.position.copy(camera.position);
+        scene.add(dLight);
+
+        aLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        scene.add(aLight);
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+        controls = new THREE.TrackballControls(camera, renderer.domElement);
+        controls.rotateSpeed = 5.0;
+        controls.addEventListener('change', render);
+
+				// resize
+				window.addEventListener( 'resize', onWindowResize, false );
+
+        material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
+        
+        render();
+
+      }
+
+			function init() {
+
+        // read datapoints information and create dropdown menus
+        $.getJSON("./datapoints.json", {}, createMenus);
+
+			}
+
+      function onGeometryLoad ( geometry ) {
+
+        geometry.computeFaceNormals();
+        geometry.computeVertexNormals();
+
+        if (mesh == null) {
+          mesh = new THREE.Mesh( geometry, material );
+          mesh.name = 'object';
+          scene.add(mesh);
+        } else {
+          mesh.geometry.dispose()
+          mesh.geometry = geometry;
+        }
+      }
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+        controls.handleResize();
+        render();
+
+			}
+
+      function render() {
+        dLight.position.copy(camera.position);
+				renderer.render( scene, camera );
+      }
+
+      function animate() {
+				requestAnimationFrame( animate );
+        controls.update();
+        render();
+			}
+
+
+		</script>
+	</body>
+</html>
