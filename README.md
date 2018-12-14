@@ -1,2 +1,3 @@
-# contactdb_website
-Website for exploring the ContactDB dataset
+# ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging
+
+Code for the website that allows exploring the ContactDB dataset. Website is hostet at http://cayley.cc.gt.atl.ga.us/contactdb_dataset/contactdb_website/
