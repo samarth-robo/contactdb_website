@@ -8,15 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
 	</head>
 	<body>
-    <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
-    <h2>
-      <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>
-      <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>
-      <a href="http://ckemp.bme.gatech.edu/" target="_blank">Charlie Kemp</a>
-      <a href="https://www.cc.gatech.edu/~hays/" target="_blank">James Hays</a>
-      <br>
-      Georgia Tech
-    </h2>
 		<script src="js/three.min.js"></script>
 		<script src="js/PLYLoader.js"></script>
 		<script src="js/WebGL.js"></script>
@@ -24,12 +15,35 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"
       integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
 
-    
-    <div class='row'>
-      <div class='col-6' id='canvas'></div>
-    </div>
-    <div class='row'>
-      <div class='col' id='controls'></div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
+          <h2>
+            <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>,
+            <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>,
+            <a href="http://ckemp.bme.gatech.edu/" target="_blank">Charlie Kemp</a>,
+            <a href="https://www.cc.gatech.edu/~hays/" target="_blank">James Hays</a>
+            <br>
+            Georgia Tech Robotics
+          </h2>
+          ContactDB is a dataset of contact maps for household objects. Objects are grasped by human participants with two post-grasp functional intents: 'use' and 'handoff'.
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+          <div class="col-5 align-self-center" id='controlsArea'></div>
+          <div class="col-7 align-self-center">
+            <canvas id="meshArea"></canvas>
+          </div>
+      </div>
+      <footer>
+        <script>
+          var d = new Date();
+          document.write('<p>&copy; Samarth Brahmbhatt ' + d.getFullYear() + ', website created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a>.</p>')
+        </script>
+      </footer>
     </div>
 
 
@@ -41,7 +55,7 @@
 
 			}
 
-			var camera, scene, renderer, container, controls, dLight, aLight, material, mesh, loader, meshName;
+			var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, meshName;
       var objectName, sessionName, instruction;
       var datapoints;
 
@@ -127,23 +141,29 @@
 
 
       function createMenus(jsondata) {
-        datapoints = jsondata;
+        datapoints = {};
+        for (var instr in jsondata) {
+          datapoints[instr] = {};
+          Object.keys(jsondata[instr]).sort().forEach(function(key) {
+            datapoints[instr][key] = jsondata[instr][key];
+          });
+        }
         
-        container = document.getElementById('controls')
+        var controlsArea = document.getElementById('controlsArea');
         iMenu = document.createElement('select');
         iMenu.id = 'instructions';
         iMenu.setAttribute('onchange', 'instructionChanged(this.value)');
-        container.appendChild(iMenu);
+        controlsArea.appendChild(iMenu);
         
         oMenu = document.createElement('select');
         oMenu.id = 'objectNames';
         oMenu.setAttribute('onchange', 'objectNameChanged(this.value)');
-        container.appendChild(oMenu);
+        controlsArea.appendChild(oMenu);
         
         sMenu = document.createElement('select');
         sMenu.id = 'sessionNames';
         sMenu.setAttribute('onchange', 'sessionNameChanged(this.value)');
-        container.appendChild(sMenu);
+        controlsArea.appendChild(sMenu);
         
         for (var instr in datapoints) {
           iMenu.options[iMenu.length] = new Option(instr);
@@ -157,10 +177,10 @@
 
       
       function initRender() {
-				container = document.getElementById('canvas');
+				meshArea = document.getElementById('meshArea');
 
-				camera = new THREE.PerspectiveCamera(60, 2, 0.1, 0.6);
-				camera.position.set(0, -0.2, 0.2);
+				camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.31);
+				camera.position.set(0, -0.16, 0.1);
 				var cameraTarget = new THREE.Vector3(0, 0, 0);
         camera.lookAt(cameraTarget);
 
@@ -170,28 +190,23 @@
 				loader = new THREE.PLYLoader();
 
 				// Lights
-        dLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        dLight = new THREE.DirectionalLight(0xFFFFFF, 0.5);
         dLight.position.copy(camera.position);
         scene.add(dLight);
 
-        aLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        aLight = new THREE.AmbientLight(0xFFFFFF, 0.77);
         scene.add(aLight);
 
 				// renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: meshArea } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
 
         controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 5.0;
         controls.addEventListener('change', render);
 
         material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
-        
-        render();
-
       }
 
 			function init() {
@@ -204,7 +219,7 @@
 			}
 
       function onGeometryLoad ( geometry ) {
-
+        geometry.center();
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
 
@@ -220,12 +235,12 @@
 
 			function resizeCanvas() {
 
-        const canvas = render.domElement;
+        const canvas = renderer.domElement;
         const width = canvas.clientWidth;
         const height= canvas.clientHeight;
 
         if (canvas.width != width || canvas.height != height) {
-          renderer.setSize(width, height, false);
+          renderer.setSize(width, height);
           camera.aspect = width / height;
           camera.updateProjectionMatrix();
         }
