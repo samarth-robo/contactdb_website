@@ -2,13 +2,36 @@
 <html lang="en">
 	<head>
 		<title>ContactDB Explorer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
 	</head>
 	<body>
+    <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
+    <h2>
+      <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>
+      <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>
+      <a href="http://ckemp.bme.gatech.edu/" target="_blank">Charlie Kemp</a>
+      <a href="https://www.cc.gatech.edu/~hays/" target="_blank">James Hays</a>
+      <br>
+      Georgia Tech
+    </h2>
 		<script src="js/three.min.js"></script>
 		<script src="js/PLYLoader.js"></script>
 		<script src="js/WebGL.js"></script>
     <script src="js/TrackballControls.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"
+      integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+    
+    <div class='row'>
+      <div class='col-6' id='canvas'></div>
+    </div>
+    <div class='row'>
+      <div class='col' id='controls'></div>
+    </div>
+
 
 		<script>
 
@@ -94,8 +117,8 @@
 
       
       function updateMesh() {
-        // var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
-        var newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        // var newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         if (newMeshName != meshName) {
           meshName = newMeshName;
           loader.load(meshName, onGeometryLoad);
@@ -105,21 +128,22 @@
 
       function createMenus(jsondata) {
         datapoints = jsondata;
-
+        
+        container = document.getElementById('controls')
         iMenu = document.createElement('select');
         iMenu.id = 'instructions';
         iMenu.setAttribute('onchange', 'instructionChanged(this.value)');
-        document.body.appendChild(iMenu);
+        container.appendChild(iMenu);
         
         oMenu = document.createElement('select');
         oMenu.id = 'objectNames';
         oMenu.setAttribute('onchange', 'objectNameChanged(this.value)');
-        document.body.appendChild(oMenu);
+        container.appendChild(oMenu);
         
         sMenu = document.createElement('select');
         sMenu.id = 'sessionNames';
         sMenu.setAttribute('onchange', 'sessionNameChanged(this.value)');
-        document.body.appendChild(sMenu);
+        container.appendChild(sMenu);
         
         for (var instr in datapoints) {
           iMenu.options[iMenu.length] = new Option(instr);
@@ -133,10 +157,9 @@
 
       
       function initRender() {
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById('canvas');
 
-				camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 0.6);
+				camera = new THREE.PerspectiveCamera(60, 2, 0.1, 0.6);
 				camera.position.set(0, -0.2, 0.2);
 				var cameraTarget = new THREE.Vector3(0, 0, 0);
         camera.lookAt(cameraTarget);
@@ -165,9 +188,6 @@
         controls.rotateSpeed = 5.0;
         controls.addEventListener('change', render);
 
-				// resize
-				window.addEventListener( 'resize', onWindowResize, false );
-
         material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
         
         render();
@@ -177,7 +197,9 @@
 			function init() {
 
         // read datapoints information and create dropdown menus
-        $.getJSON("../datapoints.json", {}, createMenus);
+        var datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+        // var datapointsName = '../datapoints.json';
+        $.getJSON(datapointsName, {}, createMenus);
 
 			}
 
@@ -196,12 +218,17 @@
         }
       }
 
-			function onWindowResize() {
+			function resizeCanvas() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+        const canvas = render.domElement;
+        const width = canvas.clientWidth;
+        const height= canvas.clientHeight;
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+        if (canvas.width != width || canvas.height != height) {
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
 
         controls.handleResize();
         render();
@@ -214,6 +241,7 @@
       }
 
       function animate() {
+        resizeCanvas();
 				requestAnimationFrame( animate );
         controls.update();
         render();
