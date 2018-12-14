@@ -131,8 +131,8 @@
 
       
       function updateMesh() {
-        var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
-        // var newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        // var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        var newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         if (newMeshName != meshName) {
           meshName = newMeshName;
           loader.load(meshName, onGeometryLoad);
@@ -212,8 +212,8 @@
 			function init() {
 
         // read datapoints information and create dropdown menus
-        var datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
-        // var datapointsName = '../datapoints.json';
+        // var datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+        var datapointsName = '../datapoints.json';
         $.getJSON(datapointsName, {}, createMenus);
 
 			}
