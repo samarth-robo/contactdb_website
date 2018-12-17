@@ -6,6 +6,11 @@
       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    <style>
+    body, html, .container {
+      height: 100%;
+    }
+    </style>
 	</head>
 	<body>
 		<script src="js/three.min.js"></script>
@@ -20,23 +25,24 @@
       <div class="row">
         <div class="col">
           <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
-          <h2>
+          <h2 id="advisors">
             <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>,
             <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>,
-            <a href="http://ckemp.bme.gatech.edu/" target="_blank">Charlie Kemp</a>,
-            <a href="https://www.cc.gatech.edu/~hays/" target="_blank">James Hays</a>
-            <br>
-            Georgia Tech Robotics
           </h2>
+          <h2>Georgia Tech Robotics</h2>
           ContactDB is a dataset of contact maps for household objects. Objects are grasped by human participants with two post-grasp functional intents: 'use' and 'handoff'.
         </div>
       </div>
 
-      <div class="row align-items-center">
-          <div class="col-5 align-self-center" id='controlsArea'></div>
-          <div class="col-7 align-self-center">
-            <canvas id="meshArea"></canvas>
-          </div>
+      <div class="row" style="height:60%;">
+        <div class="col-7 h-100" id="thumbArea">
+        </div>
+        <div class="col-5 h-100">
+          <canvas id="meshArea"></canvas>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-12" id='controlsArea'></div>
       </div>
       <footer>
         <script>
@@ -58,6 +64,7 @@
 			var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, meshName;
       var objectName, sessionName, instruction;
       var datapoints;
+      var DEV = true;
 
 			init();
 
@@ -67,14 +74,37 @@
         var instr = document.getElementById("instructions").value;
 
         // update the object names menu
+        var thumbArea = document.getElementById("thumbArea");
+        thumbArea.innerHTML = "";
         var menu = document.getElementById("objectNames");
         var prevObjectName = menu.value;
         menu.options.length = 0;
         var idxSelected = 0;
+        var row = document.createElement("div");
+        row.className = "row";
         for (var o in datapoints[instr]) {
           menu.options[menu.length] = new Option(o, o);
           if (o == prevObjectName) {
             idxSelected = menu.length - 1;
+          }
+          
+          var imgName;
+          if (DEV) {
+            imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
+          } else {
+            imgName = '../thumbnails/' + o + '.png';
+          }
+          var img = document.createElement("img");
+          img.src = imgName;
+          img.className = "img-thumbnail img-fluid";
+          var col = document.createElement("div");
+          col.className = "col";
+          col.appendChild(img);
+          row.appendChild(col);
+          if (menu.length % 10 == 0) {
+            thumbArea.appendChild(row);
+            row = document.createElement("div");
+            row.className = "row equal";
           }
         }
         menu.options[idxSelected].selected = true;
@@ -131,8 +161,12 @@
 
       
       function updateMesh() {
-        // var newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
-        var newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        var newMeshName;
+        if (DEV) {
+          newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        } else {
+          newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+        }
         if (newMeshName != meshName) {
           meshName = newMeshName;
           loader.load(meshName, onGeometryLoad);
@@ -179,7 +213,7 @@
       function initRender() {
 				meshArea = document.getElementById('meshArea');
 
-				camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.31);
+				camera = new THREE.PerspectiveCamera(60, 1, 0.01, 0.31);
 				camera.position.set(0, -0.16, 0.1);
 				var cameraTarget = new THREE.Vector3(0, 0, 0);
         camera.lookAt(cameraTarget);
@@ -210,10 +244,33 @@
       }
 
 			function init() {
+        // randomly sample the order of advisors
+        var advisors = document.getElementById("advisors");
+        var a0 = document.createElement("a")
+        a0.href = "https://www.cc.gatech.edu/~hays/"
+        a0.target = "_blank"
+        a0.innerText = "James Hays"
+        var a1 = document.createElement("a")
+        a1.href = "http://ckemp.bme.gatech.edu/"
+        a1.target = "_blank"
+        a1.innerText = "Charlie Kemp"
+        if (Math.random() > 0.5) {
+          advisors.appendChild(a0);
+          advisors.innerHTML += ", "
+          advisors.appendChild(a1);
+        } else {
+          advisors.appendChild(a1);
+          advisors.innerHTML += ", "
+          advisors.appendChild(a0);
+        }
 
         // read datapoints information and create dropdown menus
-        // var datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
-        var datapointsName = '../datapoints.json';
+        var datapointsName;
+        if (DEV) {
+          datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+        } else {
+          datapointsName = '../datapoints.json';
+        }
         $.getJSON(datapointsName, {}, createMenus);
 
 			}
@@ -235,14 +292,9 @@
 
 			function resizeCanvas() {
 
-        const canvas = renderer.domElement;
-        const width = canvas.clientWidth;
-        const height= canvas.clientHeight;
-
-        if (canvas.width != width || canvas.height != height) {
-          renderer.setSize(width, height);
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
+        var h = renderer.domElement.parentElement.clientHeight;
+        if (h != renderer.getSize().height) {
+          renderer.setSize(camera.aspect*h, h);
         }
 
         controls.handleResize();
