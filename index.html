@@ -7,19 +7,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
     <style>
-    body, html, .container {
-      height: 100%;
-    }
+      body, html, .container {
+        height: 100%;
+      }
     </style>
 	</head>
 	<body>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 		<script src="js/three.min.js"></script>
 		<script src="js/PLYLoader.js"></script>
 		<script src="js/WebGL.js"></script>
     <script src="js/TrackballControls.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"
-      integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-
 
     <div class="container">
       <div class="row">
@@ -34,11 +34,14 @@
         </div>
       </div>
 
-      <div class="row" style="height:60%;">
-        <div class="col-7 h-100" id="thumbArea">
+      <div class="row h-50">
+        <div class="col h-100">
+          <canvas class="border w-100 h-100"></canvas>
         </div>
-        <div class="col-5 h-100">
-          <canvas id="meshArea"></canvas>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="row justify-content-between btn-group btn-group-toggle flex-wrap" id="thumbArea" data-toggle="buttons"></div>
         </div>
       </div>
       <div class="row">
@@ -52,7 +55,6 @@
       </footer>
     </div>
 
-
 		<script>
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
@@ -64,11 +66,11 @@
 			var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, meshName;
       var objectName, sessionName, instruction;
       var datapoints;
+      var thumbnailHeight = 40;
       var DEV = true;
 
 			init();
 
-      
       function updateObjectNames() {
         // get instruction
         var instr = document.getElementById("instructions").value;
@@ -80,8 +82,6 @@
         var prevObjectName = menu.value;
         menu.options.length = 0;
         var idxSelected = 0;
-        var row = document.createElement("div");
-        row.className = "row";
         for (var o in datapoints[instr]) {
           menu.options[menu.length] = new Option(o, o);
           if (o == prevObjectName) {
@@ -90,22 +90,24 @@
           
           var imgName;
           if (DEV) {
-            imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
+            // imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
+            imgName = './thumbnails/' + o + '.png';
           } else {
             imgName = '../thumbnails/' + o + '.png';
           }
           var img = document.createElement("img");
           img.src = imgName;
-          img.className = "img-thumbnail img-fluid";
-          var col = document.createElement("div");
-          col.className = "col";
-          col.appendChild(img);
-          row.appendChild(col);
-          if (menu.length % 10 == 0) {
-            thumbArea.appendChild(row);
-            row = document.createElement("div");
-            row.className = "row equal";
-          }
+          img.height = thumbnailHeight;
+          var inp = document.createElement("input");
+          inp.type = "radio";
+          inp.name = "objectNameOptions";
+          inp.id = o;
+          inp.autocomplete = "off";
+          var label = document.createElement("label");
+          label.className = "btn btn-outline-primary";
+          label.appendChild(inp);
+          label.appendChild(img);
+          thumbArea.appendChild(label);
         }
         menu.options[idxSelected].selected = true;
         menu.onchange(menu.value);
@@ -163,7 +165,8 @@
       function updateMesh() {
         var newMeshName;
         if (DEV) {
-          newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+          // newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+          newMeshName = './ps_controller_textured.ply'
         } else {
           newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         }
@@ -211,9 +214,9 @@
 
       
       function initRender() {
-				meshArea = document.getElementById('meshArea');
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: document.querySelector("canvas") } );
 
-				camera = new THREE.PerspectiveCamera(60, 1, 0.01, 0.31);
+				camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.31);
 				camera.position.set(0, -0.16, 0.1);
 				var cameraTarget = new THREE.Vector3(0, 0, 0);
         camera.lookAt(cameraTarget);
@@ -230,11 +233,6 @@
 
         aLight = new THREE.AmbientLight(0xFFFFFF, 0.77);
         scene.add(aLight);
-
-				// renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: meshArea } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.shadowMap.enabled = true;
 
         controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 5.0;
@@ -267,7 +265,8 @@
         // read datapoints information and create dropdown menus
         var datapointsName;
         if (DEV) {
-          datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+          // datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+          datapointsName = './datapoints.json';
         } else {
           datapointsName = '../datapoints.json';
         }
@@ -290,17 +289,19 @@
         }
       }
 
-			function resizeCanvas() {
+      function resizeCanvasToDisplaySize() {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        if (canvas.width !== width ||canvas.height !== height) {
+          // you must pass false here or three.js sadly fights the browser
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
 
-        var h = renderer.domElement.parentElement.clientHeight;
-        if (h != renderer.getSize().height) {
-          renderer.setSize(camera.aspect*h, h);
+          // set render target sizes here
         }
-
-        controls.handleResize();
-        render();
-
-			}
+      }
 
       function render() {
         dLight.position.copy(camera.position);
@@ -308,10 +309,10 @@
       }
 
       function animate() {
-        resizeCanvas();
-				requestAnimationFrame( animate );
+        resizeCanvasToDisplaySize();
         controls.update();
         render();
+				requestAnimationFrame( animate );
 			}
 
 
