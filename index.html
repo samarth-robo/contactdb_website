@@ -43,6 +43,7 @@
           Select participant: 
           <select id="sessionNamesMenu" onchange="sessionNameChanged(this.value)"></select>
         </div>
+        <div class="col" id="displayStatus"></div>
       </div>
       <div class="row h-50">
         <div class="col h-100">
@@ -89,8 +90,8 @@
           }
           var imgName;
           if (DEV) {
-            // imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
-            imgName = './thumbnails/' + o + '.png';
+            imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
+            // imgName = './thumbnails/' + o + '.png';
           } else {
             imgName = '../thumbnails/' + o + '.png';
           }
@@ -164,11 +165,13 @@
       function updateMesh() {
         var newMeshName;
         if (DEV) {
-          // newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
-          newMeshName = './ps_controller_textured.ply'
+          newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+          // newMeshName = './ps_controller_textured.ply'
         } else {
           newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         }
+        var dispStatus = document.getElementById("displayStatus");
+        dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         if (newMeshName != meshName) {
           meshName = newMeshName;
           loader.load(meshName, onGeometryLoad);
@@ -250,8 +253,8 @@
         // read datapoints information and create dropdown menus
         var datapointsName;
         if (DEV) {
-          // datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
-          datapointsName = './datapoints.json';
+          datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
+          // datapointsName = './datapoints.json';
         } else {
           datapointsName = '../datapoints.json';
         }
@@ -272,6 +275,8 @@
           mesh.geometry.dispose()
           mesh.geometry = geometry;
         }
+        var dispStatus = document.getElementById("displayStatus");
+        dispStatus.innerHTML = "Status: Loaded <font color='green'>" + objectName + ", " + instruction + ", #" + sessionName + "</font>";
       }
 
       function resizeCanvasToDisplaySize() {
