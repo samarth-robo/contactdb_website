@@ -34,6 +34,16 @@
         </div>
       </div>
 
+      <div class="row justify-content-around">
+        <div class="col">
+          Select post-grasp intent: 
+          <select id="instructionsMenu" onchange="instructionChanged(this.value)"></select>
+        </div>
+        <div class="col">
+          Select participant: 
+          <select id="sessionNamesMenu" onchange="sessionNameChanged(this.value)"></select>
+        </div>
+      </div>
       <div class="row h-50">
         <div class="col h-100">
           <canvas class="border w-100 h-100"></canvas>
@@ -41,11 +51,8 @@
       </div>
       <div class="row">
         <div class="col">
-          <div class="row justify-content-between btn-group btn-group-toggle flex-wrap" id="thumbArea" data-toggle="buttons"></div>
+          <div class="row justify-content-around btn-group btn-group-toggle flex-wrap" id="thumbArea" data-toggle="buttons"></div>
         </div>
-      </div>
-      <div class="row">
-          <div class="col-12" id='controlsArea'></div>
       </div>
       <footer>
         <script>
@@ -72,22 +79,14 @@
 			init();
 
       function updateObjectNames() {
-        // get instruction
-        var instr = document.getElementById("instructions").value;
-
         // update the object names menu
         var thumbArea = document.getElementById("thumbArea");
         thumbArea.innerHTML = "";
-        var menu = document.getElementById("objectNames");
-        var prevObjectName = menu.value;
-        menu.options.length = 0;
-        var idxSelected = 0;
-        for (var o in datapoints[instr]) {
-          menu.options[menu.length] = new Option(o, o);
-          if (o == prevObjectName) {
-            idxSelected = menu.length - 1;
+        var selectedObject = Object.keys(datapoints[instruction])[0];
+        for (var o in datapoints[instruction]) {
+          if (o == objectName) {
+            selectedObject = o;
           }
-          
           var imgName;
           if (DEV) {
             // imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
@@ -101,30 +100,30 @@
           var inp = document.createElement("input");
           inp.type = "radio";
           inp.name = "objectNameOptions";
-          inp.id = o;
+          inp.value = o;
+          inp.id = o + "Button";
           inp.autocomplete = "off";
+          inp.setAttribute("onchange", "objectNameChanged(this.value)");
           var label = document.createElement("label");
           label.className = "btn btn-outline-primary";
+          label.setAttribute("data-toggle", "tooltip");
+          label.setAttribute("title", o);
           label.appendChild(inp);
           label.appendChild(img);
           thumbArea.appendChild(label);
         }
-        menu.options[idxSelected].selected = true;
-        menu.onchange(menu.value);
+        $('[data-toggle="tooltip"]').tooltip();
+        document.getElementById(selectedObject + "Button").click();
       }
 
       
       function updateSessionNames() {
-        // get instruction and object name
-        var instr = document.getElementById("instructions").value;
-        var oName = document.getElementById("objectNames").value;
-
         // update the session names menu
-        var menu = document.getElementById("sessionNames");
+        var menu = document.getElementById("sessionNamesMenu");
         var prevSessionName = menu.value;
         menu.options.length = 0;
         var idxSelected = 0;
-        var sessionList = datapoints[instr][oName]
+        var sessionList = datapoints[instruction][objectName]
         for (var sIdx=0; sIdx < sessionList.length; sIdx++) {
           var s = sessionList[sIdx];
           menu.options[menu.length] = new Option(s, s);
@@ -186,21 +185,7 @@
           });
         }
         
-        var controlsArea = document.getElementById('controlsArea');
-        iMenu = document.createElement('select');
-        iMenu.id = 'instructions';
-        iMenu.setAttribute('onchange', 'instructionChanged(this.value)');
-        controlsArea.appendChild(iMenu);
-        
-        oMenu = document.createElement('select');
-        oMenu.id = 'objectNames';
-        oMenu.setAttribute('onchange', 'objectNameChanged(this.value)');
-        controlsArea.appendChild(oMenu);
-        
-        sMenu = document.createElement('select');
-        sMenu.id = 'sessionNames';
-        sMenu.setAttribute('onchange', 'sessionNameChanged(this.value)');
-        controlsArea.appendChild(sMenu);
+        iMenu = document.getElementById('instructionsMenu');
         
         for (var instr in datapoints) {
           iMenu.options[iMenu.length] = new Option(instr);
