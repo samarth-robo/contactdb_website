@@ -58,7 +58,8 @@
       <footer>
         <script>
           var d = new Date();
-          document.write('<p>&copy; Samarth Brahmbhatt ' + d.getFullYear() + ', website created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a>.</p>')
+          document.write('<p>&copy; Samarth Brahmbhatt ' + d.getFullYear() + ', website created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a>'
+            ' and <a href="https://threejs.org" target="_blank">three.js</a>. Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.</p>')
         </script>
       </footer>
     </div>
@@ -76,6 +77,7 @@
       var datapoints;
       var thumbnailHeight = 40;
       var DEV = false;
+      var DEV_SERVER = 'http://cayley.cc.gt.atl.ga.us';
 
 			init();
 
@@ -89,12 +91,7 @@
             selectedObject = o;
           }
           var imgName;
-          if (DEV) {
-            imgName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/thumbnails/' + o + '.png';
-            // imgName = './thumbnails/' + o + '.png';
-          } else {
-            imgName = '../thumbnails/' + o + '.png';
-          }
+          imgName = './thumbnails/' + o + '.png';
           var img = document.createElement("img");
           img.src = imgName;
           img.height = thumbnailHeight;
@@ -165,8 +162,7 @@
       function updateMesh() {
         var newMeshName;
         if (DEV) {
-          newMeshName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
-          // newMeshName = './ps_controller_textured.ply'
+          newMeshName = DEV_SERVER + '/contactdb/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         } else {
           newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         }
@@ -253,8 +249,7 @@
         // read datapoints information and create dropdown menus
         var datapointsName;
         if (DEV) {
-          datapointsName = 'http://cayley.cc.gt.atl.ga.us/contactdb_dataset/datapoints.json';
-          // datapointsName = './datapoints.json';
+          datapointsName = DEV_SERVER + '/contactdb/datapoints.json';
         } else {
           datapointsName = '../datapoints.json';
         }
