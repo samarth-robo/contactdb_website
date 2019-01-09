@@ -72,11 +72,11 @@
 			}
 
 			var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, meshName;
-      var objectName, sessionName, instruction;
+      var objectName='ps_controller', sessionName='39', instruction='use';
       var datapoints;
       var thumbnailHeight = 40;
       var DEV = false;
-      var DEV_SERVER = 'http://cayley.cc.gt.atl.ga.us';
+      var DEV_SERVER = 'http://cog2.cc.gt.atl.ga.us';
 
 			init();
 
@@ -117,14 +117,13 @@
       function updateSessionNames() {
         // update the session names menu
         var menu = document.getElementById("sessionNamesMenu");
-        var prevSessionName = menu.value;
         menu.options.length = 0;
         var idxSelected = 0;
         var sessionList = datapoints[instruction][objectName]
         for (var sIdx=0; sIdx < sessionList.length; sIdx++) {
           var s = sessionList[sIdx];
           menu.options[menu.length] = new Option(s, s);
-          if (s == prevSessionName) {
+          if (s == sessionName) {
             idxSelected = menu.length - 1;
           }
         }
@@ -184,11 +183,14 @@
         }
         
         iMenu = document.getElementById('instructionsMenu');
-        
+        var idxSelected = 0;
         for (var instr in datapoints) {
+          if (instr == instruction) {
+            idxSelected = iMenu.length;
+          }
           iMenu.options[iMenu.length] = new Option(instr);
         }
-        iMenu.options[0].selected = true;
+        iMenu.options[idxSelected].selected = true;
         
         initRender();
         iMenu.onchange(iMenu.value);
@@ -210,11 +212,11 @@
 				loader = new THREE.PLYLoader();
 
 				// Lights
-        dLight = new THREE.DirectionalLight(0xFFFFFF, 0.5);
+        dLight = new THREE.DirectionalLight(0xFFFFFF);
         dLight.position.copy(camera.position);
         scene.add(dLight);
 
-        aLight = new THREE.AmbientLight(0xFFFFFF, 0.77);
+        aLight = new THREE.AmbientLight(0xFFFFFF, 1.7);
         scene.add(aLight);
 
         controls = new THREE.TrackballControls(camera, renderer.domElement);
