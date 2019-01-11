@@ -56,9 +56,11 @@
         </div>
       </div>
       <footer>
+        &copy; Samarth Brahmbhatt <span id="footer_year"></span>, <a href="https://github.com/samarth-robo/contactdb_website" target="_blank">website</a> created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> and <a href="https://threejs.org" target="_blank">three.js</a>. Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.
         <script>
           var d = new Date();
-          document.write('<p>&copy; Samarth Brahmbhatt ' + d.getFullYear() + ', website created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> and <a href="https://threejs.org" target="_blank">three.js</a>. Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.</p>')
+          var footer_year = document.getElementById("footer_year");
+          footer_year.innerHTML = d.getFullYear();
         </script>
       </footer>
     </div>
@@ -76,7 +78,7 @@
       var datapoints;
       var thumbnailHeight = 40;
       var DEV = false;
-      var DEV_SERVER = 'http://cog2.cc.gt.atl.ga.us';
+      var DEV_SERVER = 'https://contactdb.cc.gatech.edu';
 
 			init();
 
@@ -160,9 +162,9 @@
       function updateMesh() {
         var newMeshName;
         if (DEV) {
-          newMeshName = DEV_SERVER + '/contactdb/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+          newMeshName = DEV_SERVER + '/meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         } else {
-          newMeshName = '../meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
+          newMeshName = './meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
         }
         var dispStatus = document.getElementById("displayStatus");
         dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
@@ -250,9 +252,9 @@
         // read datapoints information and create dropdown menus
         var datapointsName;
         if (DEV) {
-          datapointsName = DEV_SERVER + '/contactdb/datapoints.json';
+          datapointsName = DEV_SERVER + '/datapoints.json';
         } else {
-          datapointsName = '../datapoints.json';
+          datapointsName = './datapoints.json';
         }
         $.getJSON(datapointsName, {}, createMenus);
 
