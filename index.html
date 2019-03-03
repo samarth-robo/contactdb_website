@@ -2,70 +2,84 @@
 <html lang="en">
 	<head>
 		<title>ContactDB Explorer</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
-    <style>
-      body, html, .container {
-        height: 100%;
-      }
-    </style>
-	</head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
 	<body>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-		<script src="js/three.min.js"></script>
-		<script src="js/PLYLoader.js"></script>
-		<script src="js/WebGL.js"></script>
-    <script src="js/TrackballControls.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous">
+    </script>
 
     <div class="container">
-      <div class="row">
-        <div class="col">
-          <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
-          <h2 id="advisors">
-            <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>,
-            <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>,
-          </h2>
-          <h2>Georgia Tech Robotics</h2>
-          ContactDB is a dataset of contact maps for household objects. Objects are grasped by human participants with two post-grasp functional intents: 'use' and 'handoff'.
+        <div class="row">
+            <div class="col">
+                <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
+                <h2 id="advisors">
+                    <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>,
+                    <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>,
+                </h2>
+                <h2>Georgia Tech Robotics</h2>
+            </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col">
+                <h3>Abstract</h3>
+                <p class="text-justify">
+                Grasping and manipulating objects is an important human skill. Since contact between hand and object is
+                fundamental to grasping, capturing it can lead to important insights. However, observing contact through
+                external sensors is challenging because of occlusion and the complexity of the human hand. We present
+                ContactDB, a novel dataset of contact maps for household objects that captures the rich hand-object
+                contact during grasping, enabled by use of a thermal camera. Participants in our study grasp 3D printed
+                objects with a post-grasp functional intent. ContactDB includes 3750 3D meshes of 50 household objects
+                textured with contact maps and 375K frames of synchronized RGB-D+thermal images. To the best of our
+                knowledge, this is the first large-scale dataset that records detailed contact maps for functional human
+                grasps. Analysis of this data shows the influence of functional intent and object size on grasping, the
+                tendency to touch/avoid `active areas' on the object surface, and the importance of palm and lower finger
+                contact. Finally, we learn to predict diverse contact patterns for unseen objects by using
+                state-of-the-art image translation and 3D convolution algorithms.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-primary" href="contactdb_paper.pdf" role="button" target="_blank">
+                    Paper (CVPR 2019 Oral)
+                </a>
+                <a class="btn btn-primary" href="contactdb_supp.pdf" role="button" target="_blank">
+                    Supplementary Material
+                </a>
+                <a class="btn btn-primary" href="contactdb_bib.txt" role="button" target="_blank">bib</a>
+                <a class="btn btn-primary" href="contactdb_explorer.html" role="button" target="_blank">
+                    Explore ContactDB
+                </a>
+            </div>
+        </div>
 
-      <div class="row justify-content-around">
-        <div class="col">
-          Select post-grasp intent: 
-          <select id="instructionsMenu" onchange="instructionChanged(this.value)"></select>
-        </div>
-        <div class="col">
-          Select participant: 
-          <select id="sessionNamesMenu" onchange="sessionNameChanged(this.value)"></select>
-        </div>
-        <div class="col" id="displayStatus"></div>
-        <div class="col-2" id="displayScale"></div>
-      </div>
-      <div class="row h-50">
-        <div class="col h-100">
-          <canvas class="border w-100 h-100"></canvas>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="row justify-content-around btn-group btn-group-toggle flex-wrap" id="thumbArea" data-toggle="buttons"></div>
-        </div>
-      </div>
-      <footer>
-        &copy; Samarth Brahmbhatt <span id="footer_year"></span>, <a href="https://github.com/samarth-robo/contactdb_website" target="_blank">website</a> created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> and <a href="https://threejs.org" target="_blank">three.js</a>. Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.
-        <script>
-          var d = new Date();
-          var footer_year = document.getElementById("footer_year");
-          footer_year.innerHTML = d.getFullYear();
-        </script>
-      </footer>
+        <footer>
+            &copy; Samarth Brahmbhatt <span id="footer_year"></span>,
+            <a href="https://github.com/samarth-robo/contactdb_website" target="_blank">website</a>
+            created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> and
+            <a href="https://threejs.org" target="_blank">three.js</a>.
+            Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.
+            <script>
+                var d = new Date();
+                var footer_year = document.getElementById("footer_year");
+                footer_year.innerHTML = d.getFullYear();
+            </script>
+        </footer>
     </div>
-
-		<script src="js/contactdb_explorer.js"></script>
+    <script src="js/advisors.js"></script>
 	</body>
 </html>
