@@ -6,6 +6,7 @@ var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, m
 var scaleScene, scaleCamera, Z0, scale, scaleInsetFrac = 0.25, scaleInsetSize, scaleControls;
 var sdLight, saLight;
 var scaleObjectSize = 0.01;
+const zoomSpeed = 0.25, rotateSpeed = 0.25;
 var rendererWidth, rendererHeight;
 var objectName='ps_controller', sessionName='39', instruction='use';
 var datapoints;
@@ -53,7 +54,7 @@ function updateSessionNames() {
     var menu = document.getElementById("sessionNamesMenu");
     menu.options.length = 0;
     var idxSelected = 0;
-    var sessionList = datapoints[instruction][objectName]
+    var sessionList = datapoints[instruction][objectName];
     for (var sIdx=0; sIdx < sessionList.length; sIdx++) {
         var s = sessionList[sIdx];
         menu.options[menu.length] = new Option(s, s);
@@ -94,13 +95,13 @@ function sessionNameChanged(value) {
 function updateMesh() {
     var newMeshName;
     if (DEV) {
-        newMeshName = './ps_controller_textured.ply'
+        newMeshName = 'debug_data/full39_use_ps_controller.ply'
     } else {
         newMeshName = './meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
     }
-    var dispStatus = document.getElementById("displayStatus");
-    dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
     if (newMeshName != meshName) {
+        var dispStatus = document.getElementById("displayStatus");
+        dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         meshName = newMeshName;
         loader.load(meshName, onGeometryLoad);
     }
@@ -137,8 +138,10 @@ function initRender() {
     renderer.autoClear = false;
     renderer.setScissorTest(true);
 
-    camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
+    // camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
+    camera = new THREE.OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
     camera.position.set(0, -0.16, 0.1);
+    camera.zoom = 2;
     var cameraTarget = new THREE.Vector3(0, 0, 0);
     camera.lookAt(cameraTarget);
 
@@ -155,8 +158,10 @@ function initRender() {
     aLight = new THREE.AmbientLight(0xFFFFFF, 1.7);
     scene.add(aLight);
 
-    controls = new THREE.TrackballControls(camera, renderer.domElement);
-    controls.rotateSpeed = 5.0;
+    // controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls = new THREE.OrthographicTrackballControls(camera, renderer.domElement);
+    controls.rotateSpeed = rotateSpeed;
+    controls.zoomSpeed   = zoomSpeed;
     controls.addEventListener('change', render);
 
     material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
@@ -176,11 +181,15 @@ function initRender() {
     scaleScene.add(line);
     scaleScene.add(sdLight);
     scaleScene.add(saLight);
-    scaleCamera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
+    // scaleCamera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
+    scaleCamera = new THREE.OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
     scaleCamera.position.set(0, -0.16, 0.1);
     scaleCamera.lookAt(cameraTarget);
-    scaleControls = new THREE.TrackballControls(scaleCamera, renderer.domElement);
-    scaleControls.rotateSpeed = 5.0;
+    scaleCamera.zoom = 2;
+    // scaleControls = new THREE.TrackballControls(scaleCamera, renderer.domElement);
+    scaleControls = new THREE.OrthographicTrackballControls(scaleCamera, renderer.domElement);
+    scaleControls.rotateSpeed = rotateSpeed;
+    scaleControls.zoomSpeed   = zoomSpeed;
     scaleControls.noPan = true;
     scaleControls.noZoom = true;
 
@@ -190,7 +199,11 @@ function initRender() {
 function init() {
     // read datapoints information and create dropdown menus
     var datapointsName;
-    datapointsName = './datapoints.json';
+    if (DEV) {
+        datapointsName = 'debug_data/datapoints.json'
+    } else {
+        datapointsName = './datapoints.json';
+    }
     $.getJSON(datapointsName, {}, createMenus);
 }
 
@@ -215,10 +228,13 @@ function resizeCanvasToDisplaySize() {
     const canvas = renderer.domElement;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    if (canvas.width !== width ||canvas.height !== height) {
+    if (canvas.width !== width || canvas.height !== height) {
         // you must pass false here or three.js sadly fights the browser
         renderer.setSize(width, height, false);
-        camera.aspect = width / height;
+        const aspect = width / height;
+        // camera.aspect = aspect;  -- for PerspectiveCamera
+        camera.left = -aspect * camera.top;
+        camera.right = aspect * camera.top;
         camera.updateProjectionMatrix();
 
         rendererWidth = width;
@@ -227,6 +243,9 @@ function resizeCanvasToDisplaySize() {
         var x = Math.round((rendererWidth-scaleInsetSize)/2.0);
         var y = Math.round((rendererHeight-scaleInsetSize)/2.0);
         scaleCamera.setViewOffset(rendererWidth, rendererHeight, x, y, scaleInsetSize, scaleInsetSize);
+        scaleCamera.left = -aspect * scaleCamera.top;
+        scaleCamera.right = aspect * scaleCamera.top;
+        scaleCamera.updateProjectionMatrix();
     }
 }
 
