@@ -6,7 +6,7 @@ var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, m
 var scaleScene, scaleCamera, Z0, scale, scaleInsetFrac = 0.25, scaleInsetSize, scaleControls;
 var sdLight, saLight;
 var scaleObjectSize = 0.01;
-const zoomSpeed = 0.25, rotateSpeed = 0.25;
+const zoomSpeed = 0.1, rotateSpeed = 0.25;
 var rendererWidth, rendererHeight;
 var objectName='ps_controller', sessionName='39', instruction='use';
 var datapoints;
@@ -193,7 +193,8 @@ function initRender() {
     scaleControls.noPan = true;
     scaleControls.noZoom = true;
 
-    Z0 = controls.target.distanceTo(controls.object.position);
+    // Z0 = controls.target.distanceTo(controls.object.position);
+    Z0 = controls.object.zoom;
 }
 
 function init() {
@@ -268,8 +269,10 @@ function animate() {
     resizeCanvasToDisplaySize();
     controls.update();
     scaleControls.update();
-    var Z1 = controls.target.distanceTo(controls.object.position);
-    scale = Z1 / Z0 * scaleObjectSize;
+    // const Z1 = controls.target.distanceTo(controls.object.position);
+    // scale = Z1 / Z0 * scaleObjectSize;
+    const Z1 = controls.object.zoom;
+    scale = Z0 / Z1 * scaleObjectSize;
     var dispScale = document.getElementById("displayScale");
     dispScale.innerHTML = "Cube Size: " + (scale*100).toFixed(1) + " cm";
     // console.log(scale);
