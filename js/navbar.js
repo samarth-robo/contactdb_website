@@ -27,9 +27,9 @@ function create_navbar() {
     navbar_nav.setAttribute('class', 'navbar-nav');
     navbar.appendChild(navbar_nav);
 
-    let class_name = 'nav-item nav-link';
     let i;
     for (i=1; i<navbar_page_ids.length; i++) {
+        let class_name = 'nav-item nav-link';
         if (document.title === navbar_page_ids[i]) {
             class_name += ' active';
         }

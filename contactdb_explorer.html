@@ -6,11 +6,6 @@
       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
-    <style>
-      body, html, .container {
-        height: 100%;
-      }
-    </style>
 	</head>
 	<body onload="create_navbar()">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -23,15 +18,10 @@
     <script src="js/OrthographicTrackballControls.js"></script>
     <script src="js/navbar.js"></script>
 
-    <div class="container">
+    <div class="container" id="explorer">
       <div class="row">
         <div class="col">
-          <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
-          <h2 id="advisors">
-            <a href="https://samarth-robo.github.io/" target="_blank">Samarth Brahmbhatt</a>,
-            <a href="https://cusuh.github.io/" target="_blank">Cusuh Ham</a>,
-          </h2>
-          <h2>Georgia Tech Robotics</h2>
+          <h1>ContactDB Explorer</h1>
         </div>
       </div>
 
@@ -67,6 +57,5 @@
       </footer>
     </div>
     <script src="js/contactdb_explorer.js"></script>
-    <script src="js/advisors.js"></script>
 	</body>
 </html>
