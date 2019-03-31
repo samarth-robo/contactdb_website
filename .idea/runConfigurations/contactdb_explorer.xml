@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="contactdb_explorer" type="JavascriptDebugType" uri="http://localhost:63342/contactdb_website/contactdb_explorer.html" useBuiltInWebServerPort="true">
+    <method v="2" />
+  </configuration>
+</component>
