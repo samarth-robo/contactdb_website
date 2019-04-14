@@ -19,27 +19,21 @@
     <script src="js/navbar.js"></script>
 
     <div class="container" id="explorer">
-      <div class="row">
-        <div class="col">
-          <h1>ContactDB Explorer</h1>
-        </div>
-      </div>
-
       <div class="row justify-content-around">
         <div class="col">
-          Select post-grasp intent: 
+            <h6 style="display: inline">Select <span class="text-primary">post-grasp intent</span></h6>:
           <select id="instructionsMenu" onchange="instructionChanged(this.value)"></select>
         </div>
         <div class="col">
-          Select participant: 
+            <h6 style="display: inline">Select <span class="text-primary">participant</span></h6>:
           <select id="sessionNamesMenu" onchange="sessionNameChanged(this.value)"></select>
         </div>
         <div class="col" id="displayStatus"></div>
         <div class="col-2" id="displayScale"></div>
       </div>
-      <div class="row h-50">
-        <div class="col h-100">
-          <canvas class="border w-100 h-100"></canvas>
+      <div class="row justify-content-center">
+        <div class="col-9">
+          <canvas class="border w-100"></canvas>
         </div>
       </div>
       <div class="row">

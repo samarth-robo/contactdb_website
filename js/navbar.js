@@ -5,9 +5,9 @@ const navbar_page_ids = [
     'ContactGrasp'
 ];
 const navbar_page_urls = [
-    'https://contactdb.cc.gatech.edu',
-    'https://contactdb.cc.gatech.edu/contactdb_explorer.html',
-    'https://contactdb.cc.gatech.edu/contactgrasp.html'];
+    'index.html',
+    'contactdb_explorer.html',
+    'contactgrasp.html'];
 
 function create_navbar() {
     let navbar_container = document.createElement('div');
@@ -23,9 +23,27 @@ function create_navbar() {
     navbar_brand.innerHTML = 'ContactDB';
     navbar.appendChild(navbar_brand);
 
+    let navbar_toggler = document.createElement('button');
+    navbar_toggler.setAttribute('class', 'navbar-toggler');
+    navbar_toggler.setAttribute('type', 'button');
+    navbar_toggler.setAttribute('data-toggle', 'collapse');
+    navbar_toggler.setAttribute('data-target', '#navbarSupportedContent');
+    navbar_toggler.setAttribute('aria-controls', 'navbarSupportedContent');
+    navbar_toggler.setAttribute('aria-expanded', 'false');
+    navbar_toggler.setAttribute('aria-label', 'toggle');
+    let toggler_span = document.createElement('span');
+    toggler_span.setAttribute('class', 'navbar-toggler-icon');
+    navbar_toggler.appendChild(toggler_span);
+    navbar.appendChild(navbar_toggler);
+
+    let navbar_content = document.createElement('div');
+    navbar_content.setAttribute('class', 'collapse navbar-collapse');
+    navbar_content.setAttribute('id', 'navbarSupportedContent');
+    navbar.appendChild(navbar_content);
+
     let navbar_nav = document.createElement('div');
     navbar_nav.setAttribute('class', 'navbar-nav');
-    navbar.appendChild(navbar_nav);
+    navbar_content.appendChild(navbar_nav);
 
     let i;
     for (i=1; i<navbar_page_ids.length; i++) {
