@@ -1,0 +1,6 @@
+@article{brahmbhatt2019contactgrasp,
+  title={ContactGrasp: Functional Multi-finger Grasp Synthesis from Contact},
+  author={Brahmbhatt, Samarth and Handa, Ankur and Hays, James and Fox, Dieter},
+  journal={arXiv preprint arXiv:1904.03754},
+  year={2019}
+}

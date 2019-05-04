@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ContactDB Blog</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <meta charset="utf-8">
+    </head>
+
+	<body onload="create_navbar()">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous">
+    </script>
+
+    <script src="js/navbar.js"></script>
+
+    <div class="container">
+    <div class="row">
+    <div class="col">
+    <p class="text-justify">
+        <h1>ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging</h1>
+        <a href="http://arxiv.org/abs/1904.06830" target="_blank">Paper (CVPR 2019 oral)</a> |
+        <a href="https://contactdb.cc.gatech.edu/contactdb_bib.txt" target="_blank">bib</a> |
+        <a href="https://contactdb.cc.gatech.edu/contactdb_explorer.html" target="_blank">Explore ContactdB</a><br>
+        Contact is an important, but often oversimplified component of grasping. Capturing hand-object contact from
+        human grasps can lead to important insights. However, observing contact through external sensors is challenging
+        because of occlusion and the complexity of the human hand. This blog post introduces <b>ContactDB</b>, the first
+        large-scale dataset of <b>contact maps</b> from human grasps of household objects. This work was done at Georgia
+        Tech by <a href="https://samarth-robo.github.io" target="_blank">Samarth Brahmbhatt</a> and
+        <a href="https://cusuh.github.io" target="_blank">Cusuh Ham</a>, as a collaboration between the labs of Drs.
+        <a href="https://charliekemp.com" target="_blank">Charlie Kemp</a> and
+        <a href="https://cc.gatech.edu/~hays" target="_blank">James Hays</a>.
+
+        <br>A typical contact map looks like this (note the detailed, continuous and real-world nature of our data,
+        which distinguishes ContactDB from
+        <a href="https://dl.acm.org/citation.cfm?id=2925927" target="_blank">previous</a>
+        <a href="https://ieeexplore.ieee.org/abstract/document/5540150/" target="_blank">attempts</a>
+        <a href="https://ieeexplore.ieee.org/abstract/document/8085141/" target="_blank">at</a>
+        <a href="https://ieeexplore.ieee.org/abstract/document/1391014/" target="_blank">capturing</a>
+        <a href="http://openaccess.thecvf.com/content_iccv_2015/html/Rogez_Understanding_Everyday_Hands_ICCV_2015_paper.html"
+           target="_blank">contact</a>):
+        <div class="text-center"><img src="blog_media/contactmap_example.gif" class="img-fluid"/></div>
+
+        <h2>Why Capture Contact Maps?</h2>
+        Human grasping has traditionally been captured in the
+        <a href="http://openaccess.thecvf.com/content_cvpr_2018/html/Garcia-Hernando_First-Person_Hand_Action_CVPR_2018_paper.html"
+           target="_blank">hand</a>-<a href="https://link.springer.com/article/10.1007/s11263-016-0895-4">pose</a>
+        <a href="https://arxiv.org/abs/1904.05349">space</a>. Contact maps capture grasping from the novel
+        perspective of <b>contact</b>. In addition, we envision that this data can be used to design ergonomic tools,
+        <a href="https://journals.sagepub.com/doi/abs/10.1177/0278364915592961" target="_blank">soft robotic</a>
+        grippers capable of executing human contact patterns, and to develop a deeper understanding of hands in action
+        from images and videos.
+
+        <h2>How We Capture Contact Maps</h2>
+        Heat transfers from warm human hands to the object surface during grasping. After this, the contact pattern can
+        be seen clearly through a thermal camera even if the object is let go. We 3D print a set of household objects
+        and abstract shapes to ensure uniform thermal properties, and invite 50 participants to our laboratory to grasp
+        them. All objects are grasped with the <b>functional intent</b> of <b>handing them off</b>, and more than half
+        are also grasped with the intent of <b>using</b> them. Once grasped, the objects are put on a turntable and
+        scanned with a Kinect V2 RGB-D camera and a
+        <a href="https://www.flir.com/products/boson/" target="_blank">FLIR Boson 640</a> thermal camera. A typical
+        scan from the RGB, depth and thermal cameras looks like this:
+        <div class="text-center">
+            <img src="blog_media/rgb_capture.gif" class="img-fluid w-25">
+            <img src="blog_media/depth_capture.gif" class="img-fluid w-25">
+            <img src="blog_media/thermal_capture.gif" class="img-fluid w-25">
+        </div>
+        The thermal images are texture-mapped to the object 3D mesh to generate a contact map.
+
+        <h2>What Insights Does This Data Reveal?</h2>
+        <b>Grasps are significantly influenced by the functional intent</b>:
+        <div class="text-center"><img src="blog_media/intent_influence.svg" class="img-fluid w-75"/></div>
+        <b>Soft tissue of the human hand in the palm and the distal parts of the fingers plays a large role in grasping.</b>
+        This is shown by the following figure, which plots the average contact areas for each object, calculated from
+        the observed grasps. The
+        <span style="color:red">red line</span> indicates an upper bound on the contact area if the grasp were
+        fingertip-only. The average contact area for many objects is significantly higher than the upper bound on
+        fingertip-only contact area.
+        <div class="text-center"><img src="blog_media/handoff_contact_areas.png" class="img-fluid w-100"></div>
+        This motivates the inclusion of non-fingertip areas in grasp prediction and modeling algorithms, and presents an
+        opportunity to inform the design of soft robotic manipulators.<br>
+        See our paper for more analysis and insights.
+
+        <h2>Predicting Contact Maps from Object Shape</h2>
+        Robots are required to manipulate known objects in many situations. For example, teams had access to object
+        3D models in the DARPA Robotics Challenge. Models that can predict optimal contact regions from known object
+        shape can help in positioning of the robot before manipulation. We have also developed the
+        <a href="https://contactdb.cc.gatech.edu/contactgrasp.html" target="_blank">ContactGrasp</a> algorithm, which
+        synthesizes human-like functional grasps for diverse robotic end-effectors from ContactDB contact maps.<br>
+        We experimented with two 3D object shape representations:
+        <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">voxel occupancy grid</a> and
+        <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html" target="_blank">
+            point-cloud</a>.
+        Since each participant's contact map is a correct way to grasp the object, we need to learn a
+        <b>one-to-many mapping</b> from object shape to contact map. We adopted two approaches from the literature for
+        this:
+        <a href="http://openaccess.thecvf.com/content_cvpr_2018/html/Firman_DiverseNet_When_One_CVPR_2018_paper.html"
+           target="_blank">DiverseNet</a> and
+        <a href="http://papers.nips.cc/paper/6270-stochastic-multiple-choice-learning-for-training-diverse-deep-ensembles"
+           target="_blank">Stochastic Multiple Choice Learning (sMCL)</a>. Our experiments show the the voxel occupancy
+        grid representation is better suited for this task. We evaluated our models on three <b>unseen</b> test classes
+        of objects: mug, pan and wine-glass to test their generalization ability across objects. Some example predictions
+        are shown below; out of 10 predictions made by our model, we are showing the 3 that are most realistic.
+        This particular model was trained with the voxel grid shape representation using DiverseNet for predicting
+        contact maps for the 'use' intent. Please see the paper for detailed quantitative evaluations of all our models.
+        <div class="text-center">
+            <img src="blog_media/mug2_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/mug3_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/mug7_use_voxnet_diversenet.gif" class="img-fluid w-25">
+        </div>
+        <div class="text-center">
+            <img src="blog_media/pan3_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/pan5_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/pan6_use_voxnet_diversenet.gif" class="img-fluid w-25">
+        </div>
+        <div class="text-center">
+            <img src="blog_media/wine_glass5_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/wine_glass7_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/wine_glass8_use_voxnet_diversenet.gif" class="img-fluid w-25">
+        </div>
+        The contact maps show plausible grasps for the objects.<br>
+        To test the generalization ability across object shapes, we also evaluated our model on <b>new shapes</b> of
+        objects seen during training:
+        <div class="text-center">
+            <img src="blog_media/camera_shapes.png" class="img-fluid" style="width: 20%">
+            <img src="blog_media/camerav2_0_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/camerav2_4_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/camerav2_9_use_voxnet_diversenet.gif" class="img-fluid w-25">
+        </div>
+        <div class="text-center">
+            <img src="blog_media/hammer_shapes.png" class="img-fluid" style="width: 20%">
+            <img src="blog_media/hammerv2_3_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/hammerv2_5_use_voxnet_diversenet.gif" class="img-fluid w-25">
+            <img src="blog_media/hammerv2_1_use_voxnet_diversenet.gif" class="img-fluid w-25">
+        </div>
+        The camera is grasped from the side with contact at the shutter button and the hammer is grasped at the
+        handle, which are good ways to grasp these objects.
+
+        <h2>Dataset, Code and Trained Models</h2>
+        You can download the entire ContactDB dataset along with code to perform deep-learning experiments on contact
+        maps at <a href="https://github.com/samarth-robo/contactdb_prediction" target="_blank">this GitHub repository</a>.
+        If you want to record your own contact maps or access our raw data, we have also open-sourced our data
+        collection and processing code at <a href="https://github.com/samarth-robo/contactdb_utils" target="_blank">this
+        GitHub repository</a> (data collection requires ROS).
+    </p>
+    </div>
+    </div>
+    <footer>
+        &copy; Samarth Brahmbhatt <span id="footer_year"></span>,
+        <a href="https://github.com/samarth-robo/contactdb_website" target="_blank">website</a>
+        created using <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> and
+        <a href="https://threejs.org" target="_blank">three.js</a>.
+        Thumbnails from <a href="https://openclipart.org" target="_blank">openclipart</a>.
+        <script>
+            var d = new Date();
+            var footer_year = document.getElementById("footer_year");
+            footer_year.innerHTML = d.getFullYear();
+        </script>
+    </footer>
+    </div>
+	</body>
+</html>
