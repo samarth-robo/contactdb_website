@@ -40,8 +40,9 @@
         <a href="https://charliekemp.com" target="_blank">Charlie Kemp</a> and
         <a href="https://cc.gatech.edu/~hays" target="_blank">James Hays</a>.
 
-        <br>A typical contact map looks like this (note the detailed, continuous and real-world nature of our data,
-        which distinguishes ContactDB from
+        <br>A contact map is a textured mesh of the object, where the texture indicates contact. A typical contact map
+        looks like this (note the detailed, continuous and real-world nature of our data, which distinguishes ContactDB
+        from
         <a href="https://dl.acm.org/citation.cfm?id=2925927" target="_blank">previous</a>
         <a href="https://ieeexplore.ieee.org/abstract/document/5540150/" target="_blank">attempts</a>
         <a href="https://ieeexplore.ieee.org/abstract/document/8085141/" target="_blank">at</a>
@@ -49,6 +50,7 @@
         <a href="http://openaccess.thecvf.com/content_iccv_2015/html/Rogez_Understanding_Everyday_Hands_ICCV_2015_paper.html"
            target="_blank">contact</a>):
         <div class="text-center"><img src="blog_media/contactmap_example.gif" class="img-fluid"/></div>
+        (above) A contact map for 'binoculars'.
 
         <h2>Why Capture Contact Maps?</h2>
         Human grasping has traditionally been captured in the
@@ -74,11 +76,13 @@
             <img src="blog_media/depth_capture.gif" class="img-fluid w-25">
             <img src="blog_media/thermal_capture.gif" class="img-fluid w-25">
         </div>
+        (above) Data stream from the RGB (left), depth (middle), and thermal (right) cameras while scanning an object.<br>
         The thermal images are texture-mapped to the object 3D mesh to generate a contact map.
 
         <h2>What Insights Does This Data Reveal?</h2>
         <b>Grasps are significantly influenced by the functional intent</b>:
         <div class="text-center"><img src="blog_media/intent_influence.svg" class="img-fluid w-75"/></div>
+        (above) Influence of functional intent on contact maps.<br>
         <b>Soft tissue of the human hand in the palm and the distal parts of the fingers plays a large role in grasping.</b>
         This is shown by the following figure, which plots the average contact areas for each object, calculated from
         the observed grasps. The
@@ -86,9 +90,10 @@
         fingertip-only. The average contact area for many objects is significantly higher than the upper bound on
         fingertip-only contact area.
         <div class="text-center"><img src="blog_media/handoff_contact_areas.png" class="img-fluid w-100"></div>
+        (above) Blue bars: average contact areas. Red line: Upper bound on fingertip-only contact area.<br>
         This motivates the inclusion of non-fingertip areas in grasp prediction and modeling algorithms, and presents an
         opportunity to inform the design of soft robotic manipulators.<br>
-        See our paper for more analysis and insights.
+        See the paper for more analysis and insights.
 
         <h2>Predicting Contact Maps from Object Shape</h2>
         Robots are required to manipulate known objects in many situations. For example, teams had access to object
@@ -98,8 +103,8 @@
         synthesizes human-like functional grasps for diverse robotic end-effectors from ContactDB contact maps.<br>
         We experimented with two 3D object shape representations:
         <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">voxel occupancy grid</a> and
-        <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html" target="_blank">
-            point-cloud</a>.
+        <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html"
+           target="_blank">point-cloud</a>.
         Since each participant's contact map is a correct way to grasp the object, we need to learn a
         <b>one-to-many mapping</b> from object shape to contact map. We adopted two approaches from the literature for
         this:
@@ -127,6 +132,7 @@
             <img src="blog_media/wine_glass7_use_voxnet_diversenet.gif" class="img-fluid w-25">
             <img src="blog_media/wine_glass8_use_voxnet_diversenet.gif" class="img-fluid w-25">
         </div>
+        (above) Contact map predictions for unseen objects: mug (top), pan (middle), and wine-glass (bottom).
         The contact maps show plausible grasps for the objects.<br>
         To test the generalization ability across object shapes, we also evaluated our model on <b>new shapes</b> of
         objects seen during training:
@@ -142,6 +148,7 @@
             <img src="blog_media/hammerv2_5_use_voxnet_diversenet.gif" class="img-fluid w-25">
             <img src="blog_media/hammerv2_1_use_voxnet_diversenet.gif" class="img-fluid w-25">
         </div>
+        (above) Contact map predictions for unseen shapes of seen training objects: camera (top), hammer (middle).<br>
         The camera is grasped from the side with contact at the shutter button and the hammer is grasped at the
         handle, which are good ways to grasp these objects.
 
