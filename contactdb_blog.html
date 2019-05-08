@@ -31,6 +31,15 @@
         <a href="http://arxiv.org/abs/1904.06830" target="_blank">Paper (CVPR 2019 oral)</a> |
         <a href="https://contactdb.cc.gatech.edu/contactdb_bib.txt" target="_blank">bib</a> |
         <a href="https://contactdb.cc.gatech.edu/contactdb_explorer.html" target="_blank">Explore ContactdB</a><br>
+
+        Many times a day, people effortlessly grasp objects, yet human grasping is a complex phenomenon that has proven
+        challenging to emulate and analyze. If robots could better grasp objects, they could be more useful in homes and
+        factories. If AI systems could better perceive human grasping, they could more naturally interact and
+        collaborate with people. If researchers better understood human grasping, they might find new ways to help
+        people whose hands are impaired. A key aspect of human grasping that has been hidden from view is the
+        <b>contact</b> that occurs between the human hand and the object. We present a novel method that reveals this
+        hidden interaction, opening up a new path for research on human grasping.<br>
+
         Contact is an important, but often oversimplified component of grasping. Capturing hand-object contact from
         human grasps can lead to important insights. However, observing contact through external sensors is challenging
         because of occlusion and the complexity of the human hand. This blog post introduces <b>ContactDB</b>, the first
@@ -98,21 +107,20 @@
         <h2>Predicting Contact Maps from Object Shape</h2>
         Robots are required to manipulate known objects in many situations. For example, teams had access to object
         3D models in the DARPA Robotics Challenge. Models that can predict optimal contact regions from known object
-        shape can help in positioning of the robot before manipulation. We have also developed the
-        <a href="https://contactdb.cc.gatech.edu/contactgrasp.html" target="_blank">ContactGrasp</a> algorithm, which
-        synthesizes human-like functional grasps for diverse robotic end-effectors from ContactDB contact maps.<br>
-        We experimented with two 3D object shape representations:
-        <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">voxel occupancy grid</a> and
-        <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html"
-           target="_blank">point-cloud</a>.
-        Since each participant's contact map is a correct way to grasp the object, we need to learn a
-        <b>one-to-many mapping</b> from object shape to contact map. We adopted two approaches from the literature for
-        this:
+        shape can help in positioning of the robot before manipulation.<br>
+        Since each participant's contact map is a correct way to grasp the object, there are multiple correct
+        contact maps for each object. Hence, we need to learn a <b>one-to-many mapping</b> from object shape to contact
+        map. We adopted two approaches from the literature for this:
         <a href="http://openaccess.thecvf.com/content_cvpr_2018/html/Firman_DiverseNet_When_One_CVPR_2018_paper.html"
            target="_blank">DiverseNet</a> and
         <a href="http://papers.nips.cc/paper/6270-stochastic-multiple-choice-learning-for-training-diverse-deep-ensembles"
-           target="_blank">Stochastic Multiple Choice Learning (sMCL)</a>. Our experiments show the the voxel occupancy
-        grid representation is better suited for this task. We evaluated our models on three <b>unseen</b> test classes
+           target="_blank">Stochastic Multiple Choice Learning (sMCL)</a>. We experimented with two 3D object shape
+        representations:
+        <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">voxel occupancy grid</a> and
+        <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html"
+           target="_blank">point-cloud</a>.
+        Our experiments show the the voxel occupancy grid representation is better suited for this task.
+        We evaluated our models on three <b>unseen</b> test classes
         of objects: mug, pan and wine-glass to test their generalization ability across objects. Some example predictions
         are shown below; out of 10 predictions made by our model, we are showing the 3 that are most realistic.
         This particular model was trained with the voxel grid shape representation using DiverseNet for predicting
@@ -148,7 +156,7 @@
             <img src="blog_media/hammerv2_5_use_voxnet_diversenet.gif" class="img-fluid w-25">
             <img src="blog_media/hammerv2_1_use_voxnet_diversenet.gif" class="img-fluid w-25">
         </div>
-        (above) Contact map predictions for unseen shapes of seen training objects: camera (top), hammer (middle).<br>
+        (above) Contact map predictions for unseen shapes of seen training objects: camera (top), hammer (bottom).<br>
         The camera is grasped from the side with contact at the shutter button and the hammer is grasped at the
         handle, which are good ways to grasp these objects.
 
@@ -158,6 +166,16 @@
         If you want to record your own contact maps or access our raw data, we have also open-sourced our data
         collection and processing code at <a href="https://github.com/samarth-robo/contactdb_utils" target="_blank">this
         GitHub repository</a> (data collection requires ROS).
+
+        <h2>Future Directions</h2>
+        ContactDB contact maps record where humans touch objects to grasp them, in detail. We plan to collect more
+        contact maps with additional data like hand and object pose in a video looking at the grasp from various
+        perspectives. This data can be used in several applications: improving pose estimation of hands grasping objects
+        by constraining the pose with contact maps, training models to predict contact regions and use contact at
+        certain 'active regions' of the object to trigger events, etc.
+        We have also developed the
+        <a href="https://contactdb.cc.gatech.edu/contactgrasp.html" target="_blank">ContactGrasp</a> algorithm, which
+        synthesizes human-like functional grasps for diverse robotic end-effectors from ContactDB contact maps.
     </p>
     </div>
     </div>
