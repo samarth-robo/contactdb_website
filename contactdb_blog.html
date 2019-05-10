@@ -115,15 +115,17 @@
            target="_blank">DiverseNet</a> and
         <a href="http://papers.nips.cc/paper/6270-stochastic-multiple-choice-learning-for-training-diverse-deep-ensembles"
            target="_blank">Stochastic Multiple Choice Learning (sMCL)</a>. We experimented with two 3D object shape
-        representations:
-        <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">voxel occupancy grid</a> and
+        representations: <b>voxel occupancy grid</b> (processed by a
+        <a href="https://ieeexplore.ieee.org/abstract/document/7353481/" target="_blank">CNN architecture</a> with 3D
+        convolutions), and <b>pointcloud</b> (processed by the
         <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html"
-           target="_blank">point-cloud</a>.
-        Our experiments show the the voxel occupancy grid representation is better suited for this task.
+           target="_blank">PointNet</a> architecture).
+        We found in our experiments that the voxel occupancy grid representation is better suited for this task, probably
+        because the CNN with 3D convolutions learns a hierarchical representation, while PointNet does not.
         We evaluated our models on three <b>unseen</b> test classes
         of objects: mug, pan and wine-glass to test their generalization ability across objects. Some example predictions
         are shown below; out of 10 predictions made by our model, we are showing the 3 that are most realistic.
-        This particular model was trained with the voxel grid shape representation using DiverseNet for predicting
+        This particular model was trained with the voxel occupancy grid shape representation using DiverseNet for predicting
         contact maps for the 'use' intent. Please see the paper for detailed quantitative evaluations of all our models.
         <div class="text-center">
             <img src="blog_media/mug2_use_voxnet_diversenet.gif" class="img-fluid w-25">
