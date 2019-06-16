@@ -2,12 +2,15 @@
 const navbar_page_ids = [
     'ContactDB',
     'ContactDB Explorer',
-    'ContactGrasp'
+    'ContactGrasp',
+    'Grasp Capture'
 ];
 const navbar_page_urls = [
     'index.html',
     'contactdb_explorer.html',
-    'contactgrasp.html'];
+    'contactgrasp.html',
+    'grasp_capture.html'
+];
 
 function create_navbar() {
     let navbar_container = document.createElement('div');

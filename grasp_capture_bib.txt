@@ -1,0 +1,6 @@
+@article{brahmbhatt2019graspcapture,
+  title={Towards Markerless Grasp Capture},
+  author={Brahmbhatt, Samarth and Kemp, Charles C. and Hays, James},
+  journal={CVPR Workshop on Computer Vision for Augmented and Virtual Reality},
+  year={2019}
+}

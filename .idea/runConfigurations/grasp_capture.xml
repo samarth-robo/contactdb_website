@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="grasp_capture" type="JavascriptDebugType" uri="http://localhost:63342/contactdb_website/grasp_capture.html" useBuiltInWebServerPort="true">
+    <method v="2" />
+  </configuration>
+</component>
