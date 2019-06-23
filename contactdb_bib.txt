@@ -1,6 +1,7 @@
-@inproceedings{brahmbhatt2018contactdb,
-  title={ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging,
-  author={Samarth Brahmbhatt and Cusuh Ham and Charles C. Kemp and James Hays},
-  booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year={2019}
+@InProceedings{Brahmbhatt_2019_CVPR,
+author = {Brahmbhatt, Samarth and Ham, Cusuh and Kemp, Charles C. and Hays, James},
+title = {ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging},
+booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+month = {June},
+year = {2019}
 }
