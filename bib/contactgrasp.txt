@@ -1,0 +1,6 @@
+@INPROCEEDINGS{brahmbhatt2019contactgrasp,
+  title={{ContactGrasp: Functional Multi-finger Grasp Synthesis from Contact}},
+  author={Brahmbhatt, Samarth and Handa, Ankur and Hays, James and Fox, Dieter},
+  booktitle={2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year={2019}
+}

@@ -11,7 +11,7 @@ var rendererWidth, rendererHeight;
 var objectName='ps_controller', sessionName='39', instruction='use';
 var datapoints;
 var thumbnailHeight = 40;
-var DEV = true;
+var DEV = false;
 
 init();
 
@@ -99,7 +99,7 @@ function sessionNameChanged(value) {
 function updateMesh() {
     var newMeshName;
     if (DEV) {
-        newMeshName = 'http://localhost:8000/debug_data/full39_use_ps_controller.ply'
+        newMeshName = 'http://localhost:8000/debug_data/contactdb/full39_use_ps_controller.ply'
     } else {
         newMeshName = './meshes/full' + sessionName + '_' + instruction + '_' + objectName + '.ply';
     }
@@ -205,7 +205,7 @@ function init() {
     // read datapoints information and create dropdown menus
     var datapointsName;
     if (DEV) {
-        datapointsName = 'http://localhost:8000/debug_data/datapoints.json'
+        datapointsName = 'http://localhost:8000/debug_data/contactdb/datapoints.json'
     } else {
         datapointsName = './datapoints.json';
     }
