@@ -26,6 +26,7 @@ const bone_radius_m = 2.5e-3;
 const bone_material = new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(224, 172, 105)")});
 const joint_materials = [new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(0, 255, 0)")}),
     new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(255, 0, 0)")})];
+let global_offset = new THREE.Vector3();
 
 init();
 
@@ -211,6 +212,10 @@ function init() {
     $.getJSON(datapointsName, {}, createMenus);
 }
 
+function loadGeometryAndHands(annotationsName, geometry) {
+    onGeometryLoad(geometry);
+    $.getJSON(annotationsName, {}, createHands);
+}
 
 function updateMesh() {
     var newMeshName, newAnnotationsName;
@@ -227,13 +232,14 @@ function updateMesh() {
         var dispStatus = document.getElementById("displayStatus");
         dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         meshName = newMeshName;
-        loader.load(meshName, onGeometryLoad);
-        $.getJSON(newAnnotationsName, {}, createHands);
+        var cb = loadGeometryAndHands.bind(null, newAnnotationsName);
+        loader.load(meshName, cb);
     }
 }
 
-
 function onGeometryLoad ( geometry ) {
+    geometry.computeBoundingBox();
+    geometry.boundingBox.getCenter(global_offset);
     geometry.center();
     geometry.computeFaceNormals();
     geometry.computeVertexNormals();
@@ -250,7 +256,6 @@ function onGeometryLoad ( geometry ) {
     dispStatus.innerHTML = "Status: Loaded <font color='green'>" + objectName + ", " + instruction + ", #" + sessionName + "</font>";
 }
 
-
 function createHands(annotations) {
     // remove all geoms
     for (geom of hands.children) {
@@ -261,10 +266,17 @@ function createHands(annotations) {
 
     annotations['hands'].forEach(function(hand, hand_idx) {
         if (!hand['valid']) return;
+        // apply all offsets, transforms etc.
+        const hand_joints = hand['joints'].map(function(joint) {
+            const j = new THREE.Vector3(...joint);
+            let v = new THREE.Vector3();
+            v.subVectors(j, global_offset);
+            return v;
+        })
         // create new joint spheres
-        hand['joints'].forEach(function(joint, joint_idx) {
+        hand_joints.forEach(function(joint, joint_idx) {
             let geom = new THREE.SphereGeometry(radius=joint_radius_m);
-            geom.translate(...joint);
+            geom.translate(...joint.toArray());
             let m = new THREE.Mesh(geom, joint_materials[hand_idx]);
             m.name = 'joint_' + hand_idx + '_' + joint_idx;
             hands.add(m);
@@ -273,8 +285,8 @@ function createHands(annotations) {
         hand_line_ids.forEach(function(joint_idxs) {
             const jidx0 = joint_idxs[0];
             const jidx1 = joint_idxs[1];
-            const j0 = new THREE.Vector3(...hand['joints'][jidx0]);
-            const j1 = new THREE.Vector3(...hand['joints'][jidx1]);
+            const j0 = hand_joints[jidx0];
+            const j1 = hand_joints[jidx1];
             let v = new THREE.Vector3();
             v.subVectors(j1, j0);
             let geom = new THREE.CylinderGeometry(bone_radius_m, bone_radius_m,
@@ -284,7 +296,7 @@ function createHands(annotations) {
             m.name = 'bone_' + hand_idx + '_' + jidx0 + '_' + jidx1;
             m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0),
                 v.normalize());
-            m.position.set(...hand['joints'][jidx0]);
+            m.position.set(...hand_joints[jidx0].toArray());
             hands.add(m);
         })
     });
