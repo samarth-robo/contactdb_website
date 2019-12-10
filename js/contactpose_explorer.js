@@ -30,12 +30,13 @@ let global_offset = new THREE.Vector3();
 
 init();
 
+// update the object names menu
 function updateObjectNames() {
-    // update the object names menu
     var thumbArea = document.getElementById("thumbArea");
     thumbArea.innerHTML = "";
-    var selectedObject = Object.keys(datapoints[instruction])[0];
+    var selectedObject = null;
     for (var o in datapoints[instruction]) {
+        if (!datapoints[instruction][o].includes(parseInt(sessionName))) continue;
         if (o == objectName) {
             selectedObject = o;
         }
@@ -64,12 +65,24 @@ function updateObjectNames() {
         thumbArea.appendChild(label);
     }
     $('[data-toggle="tooltip"]').tooltip();
+
+    if (!selectedObject) {
+        for (var o in datapoints[instruction]) {
+            if (datapoints[instruction][o].includes(parseInt(sessionName))) {
+                selectedObject = o;
+                break;
+            }
+        }
+    }
     document.getElementById(selectedObject + "Button").click();
+    if (selectedObject != objectName) {
+        console.log('Error in updateObjectNames()');
+    }
 }
 
 
+// update the session names menu
 function updateSessionNames() {
-    // update the session names menu
     var menu = document.getElementById("sessionNamesMenu");
     menu.options.length = 0;
     var idxSelected = 0;
@@ -82,7 +95,34 @@ function updateSessionNames() {
         }
     }
     menu.options[idxSelected].selected = true;
-    menu.onchange(menu.value);
+
+    if (menu.value != sessionName) {
+        // menu.onchange(menu.value);
+        console.log('Error in updateSesssionNames()');
+    }
+}
+
+
+// update instructions menu
+function updateInstructions() {
+    var menu = document.getElementById("instructionsMenu");
+    menu.options.length = 0;
+    const insList = Object.keys(datapoints);
+    var idxSelected = 0;
+    for (var iIdx=0; iIdx < insList.length; iIdx++) {
+        const ins = insList[iIdx];
+        if (!datapoints[ins][objectName].includes(parseInt(sessionName))) continue;
+        menu.options[menu.length] = new Option(ins, ins);
+        if (ins == instruction) {
+            idxSelected = menu.length - 1;
+        }
+    }
+    menu.options[idxSelected].selected = true;
+
+    if (menu.value != instruction) {
+        // menu.onchange(menu.value);
+        console.log('Error in updateInstructions()');
+    }
 }
 
 
@@ -97,16 +137,23 @@ function updateMenus(instructionSelected, objectNameSelected) {
 
 function instructionChanged(value) {
     instruction = value;
-    updateMenus(true, false);
+    //updateMenus(true, false);
+    updateSessionNames();
+    updateObjectNames();
     updateMesh();
 }
 function objectNameChanged(value) {
     objectName = value;
-    updateMenus(false, true);
+    // updateMenus(false, true);
+    updateInstructions();
+    updateSessionNames();
     updateMesh();
 }
 function sessionNameChanged(value) {
     sessionName = value;
+    // updateObjectNames();
+    updateInstructions();
+    updateObjectNames();
     updateMesh();
 }
 
@@ -268,8 +315,6 @@ function createHands(annotations) {
         geom.geometry.dispose();
     }
     hands.children.length = 0;
-    console.log(hands.children.length);
-    // scene.remove(hands);
 
     annotations['hands'].forEach(function(hand, hand_idx) {
         if (!hand['valid']) return;
@@ -307,7 +352,6 @@ function createHands(annotations) {
             hands.add(m);
         })
     });
-    console.log(hands.children.length);
 }
 
 
