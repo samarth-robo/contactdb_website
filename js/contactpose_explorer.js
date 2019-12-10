@@ -111,7 +111,8 @@ function updateInstructions() {
     var idxSelected = 0;
     for (var iIdx=0; iIdx < insList.length; iIdx++) {
         const ins = insList[iIdx];
-        if (!datapoints[ins][objectName].includes(parseInt(sessionName))) continue;
+        if (!(objectName in datapoints[ins]) ||
+            !datapoints[ins][objectName].includes(parseInt(sessionName))) continue;
         menu.options[menu.length] = new Option(ins, ins);
         if (ins == instruction) {
             idxSelected = menu.length - 1;
@@ -126,32 +127,20 @@ function updateInstructions() {
 }
 
 
-function updateMenus(instructionSelected, objectNameSelected) {
-    if (instructionSelected) {
-        updateObjectNames();
-    } else if (objectNameSelected) {
-        updateSessionNames();
-    }
-}
-
-
 function instructionChanged(value) {
     instruction = value;
-    //updateMenus(true, false);
     updateSessionNames();
     updateObjectNames();
     updateMesh();
 }
 function objectNameChanged(value) {
     objectName = value;
-    // updateMenus(false, true);
     updateInstructions();
     updateSessionNames();
     updateMesh();
 }
 function sessionNameChanged(value) {
     sessionName = value;
-    // updateObjectNames();
     updateInstructions();
     updateObjectNames();
     updateMesh();
