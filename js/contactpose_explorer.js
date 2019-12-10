@@ -12,7 +12,7 @@ var objectName='ps_controller', sessionName='39', instruction='use';
 var datapoints;
 var thumbnailHeight = 40;
 let hands = new THREE.Group();
-var DEV = true;
+var DEV = false;
 const hand_line_ids = [
     [0, 1], [0, 5], [0, 9], [0, 13], [0, 17],
     [1, 2], [2, 3], [3, 4],
@@ -149,6 +149,7 @@ function initRender() {
     camera.lookAt(cameraTarget);
 
     scene = new THREE.Scene();
+    scene.add(hands);
     scene.background = new THREE.Color( 0xFFFFFF );
 
     loader = new THREE.PLYLoader();
@@ -207,15 +208,17 @@ function init() {
     if (DEV) {
         datapointsName = 'http://localhost:8000/debug_data/contactpose/datapoints.json'
     } else {
-        datapointsName = './datapoints.json';
+        datapointsName = './contactpose_data/datapoints.json';
     }
     $.getJSON(datapointsName, {}, createMenus);
 }
+
 
 function loadGeometryAndHands(annotationsName, geometry) {
     onGeometryLoad(geometry);
     $.getJSON(annotationsName, {}, createHands);
 }
+
 
 function updateMesh() {
     var newMeshName, newAnnotationsName;
@@ -223,9 +226,9 @@ function updateMesh() {
         newMeshName = 'http://localhost:8000/debug_data/contactpose/full39_use_ps_controller.ply'
         newAnnotationsName = 'http://localhost:8000/debug_data/contactpose/full39_use_ps_controller.json'
     } else {
-        newMeshName = './contactpose/meshes/full' + sessionName + '_' + 
+        newMeshName = './contactpose_data/meshes/full' + sessionName + '_' + 
             instruction + '_' + objectName + '.ply';
-        newAnnotationsName = '.contactpose/annotations/full' + sessionName +
+        newAnnotationsName = './contactpose_data/annotations/full' + sessionName +
             '_' + instruction + '_' + objectName + '.json';
     }
     if (newMeshName != meshName) {
@@ -236,6 +239,7 @@ function updateMesh() {
         loader.load(meshName, cb);
     }
 }
+
 
 function onGeometryLoad ( geometry ) {
     geometry.computeBoundingBox();
@@ -256,13 +260,16 @@ function onGeometryLoad ( geometry ) {
     dispStatus.innerHTML = "Status: Loaded <font color='green'>" + objectName + ", " + instruction + ", #" + sessionName + "</font>";
 }
 
+
 function createHands(annotations) {
     // remove all geoms
     for (geom of hands.children) {
+        geom.parent.remove(geom);
         geom.geometry.dispose();
-        hands.remove(geom);
     }
-    scene.remove(hands);
+    hands.children.length = 0;
+    console.log(hands.children.length);
+    // scene.remove(hands);
 
     annotations['hands'].forEach(function(hand, hand_idx) {
         if (!hand['valid']) return;
@@ -300,7 +307,7 @@ function createHands(annotations) {
             hands.add(m);
         })
     });
-    scene.add(hands);
+    console.log(hands.children.length);
 }
 
 
