@@ -2,6 +2,6 @@
 author = {Brahmbhatt, Samarth and Ham, Cusuh and Kemp, Charles C. and Hays, James},
 title = {{ContactDB}: Analyzing and Predicting Grasp Contact via Thermal Imaging},
 booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-month = {June},
+month = {6},
 year = {2019}
 }
