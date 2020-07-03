@@ -11,12 +11,6 @@
             "url": "http://localhost:8000/contactdb_explorer.html"
         },
         {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch contactpose_explorer.html",
-            "url": "http://localhost:8000/contactpose_explorer.html"
-        },
-        {
             "name": "Simple HTTP Server",
             "type": "python",
             "request": "launch",
@@ -29,10 +23,6 @@
         {
             "name": "Debug contactdb_explorer.html",
             "configurations": ["Simple HTTP Server", "Launch contactdb_explorer.html"]
-        },
-        {
-            "name": "Debug contactpose_explorer.html",
-            "configurations": ["Simple HTTP Server", "Launch contactpose_explorer.html"]
         },
     ]
 }
