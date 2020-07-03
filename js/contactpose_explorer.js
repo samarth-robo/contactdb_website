@@ -12,7 +12,7 @@ var objectName='ps_controller', sessionName='39', instruction='use';
 var datapoints;
 var thumbnailHeight = 40;
 let hands = new THREE.Group();
-var DEV = true;
+var DEV = false;
 const hand_line_ids = [
     [0, 1], [0, 5], [0, 9], [0, 13], [0, 17],
     [1, 2], [2, 3], [3, 4],

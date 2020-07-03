@@ -19,7 +19,7 @@ function create_navbar() {
     let navbar_brand = document.createElement('a');
     navbar_brand.setAttribute('class', 'navbar-brand');
     navbar_brand.setAttribute('href', navbar_page_urls[0]);
-    navbar_brand.innerHTML = 'ContactDB';
+    navbar_brand.innerHTML = navbar_page_ids[0];
     navbar.appendChild(navbar_brand);
 
     let navbar_toggler = document.createElement('button');
