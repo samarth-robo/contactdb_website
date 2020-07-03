@@ -1,0 +1,7 @@
+@InProceedings{Brahmbhatt_2020_ECCV,
+author = {Brahmbhatt, Samarth and Tang, Chengcheng and Twigg, Christopher D. and Kemp, Charles C. and Hays, James},
+title = {{ContactPose}: A Dataset of Grasps with Object Contact and Hand Pose},
+booktitle = {The European Conference on Computer Vision (ECCV)},
+month = {August},
+year = {2020}
+}

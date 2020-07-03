@@ -1,15 +1,11 @@
 // should match with document.title
 const navbar_page_ids = [
-    'ContactDB',
-    'ContactDB Explorer',
-    'ContactGrasp',
-    'Grasp Capture'
+    'ContactPose',
+    'ContactPose Explorer',
 ];
 const navbar_page_urls = [
     'index.html',
-    'contactdb_explorer.html',
-    'contactgrasp.html',
-    'grasp_capture.html'
+    'contactpose_explorer.html',
 ];
 
 function create_navbar() {
