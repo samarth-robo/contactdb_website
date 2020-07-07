@@ -252,7 +252,10 @@ function init() {
 
 function loadGeometryAndHands(annotationsName, geometry) {
     onGeometryLoad(geometry);
-    $.getJSON(annotationsName, {}, createHands);
+    clearHands();
+    if (objectName != 'palm_print') {  // palm_print does not have joint annotations
+        $.getJSON(annotationsName, {}, createHands);
+    }
 }
 
 
@@ -297,14 +300,16 @@ function onGeometryLoad ( geometry ) {
 }
 
 
-function createHands(annotations) {
-    // remove all geoms
+function clearHands() {
     for (geom of hands.children) {
         geom.parent.remove(geom);
         geom.geometry.dispose();
     }
     hands.children.length = 0;
+}
 
+
+function createHands(annotations) {
     annotations['hands'].forEach(function(hand, hand_idx) {
         if (!hand['valid']) return;
         // apply all offsets, transforms etc.
