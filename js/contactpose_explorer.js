@@ -8,7 +8,7 @@ var sdLight, saLight;
 var scaleObjectSize = 0.01;
 const zoomSpeed = 0.1, rotateSpeed = 0.25;
 var rendererWidth, rendererHeight;
-var objectName='ps_controller', sessionName='39', instruction='use';
+var objectName='camera', sessionName='1', instruction='use';
 var datapoints;
 var thumbnailHeight = 40;
 let hands = new THREE.Group();
