@@ -6,13 +6,13 @@ var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, m
 var scaleScene, scaleCamera, Z0, scale, scaleInsetFrac = 0.25, scaleInsetSize, scaleControls;
 var sdLight, saLight;
 var scaleObjectSize = 0.01;
-const zoomSpeed = 0.1, rotateSpeed = 0.25;
+const zoomSpeed = 1.2, rotateSpeed = 1.5;
 var rendererWidth, rendererHeight;
 var objectName='banana', sessionName='1', instruction='use';
 var datapoints;
 var thumbnailHeight = 40;
 let hands = new THREE.Group();
-var DEV = false;
+var DEV = true;
 const hand_line_ids = [
     [0, 1], [0, 5], [0, 9], [0, 13], [0, 17],
     [1, 2], [2, 3], [3, 4],
@@ -23,9 +23,21 @@ const hand_line_ids = [
 ]
 const joint_radius_m = 4e-3;
 const bone_radius_m = 2.5e-3;
-const bone_material = new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(224, 172, 105)")});
-const joint_materials = [new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(0, 255, 0)")}),
-    new THREE.MeshStandardMaterial({color: new THREE.Color("rgb(255, 0, 0)")})];
+const bone_material = new THREE.MeshStandardMaterial({
+    color: new THREE.Color("rgb(198, 134, 66)"),
+    roughness: 0.5,
+    metalness: 0.5});
+const joint_materials = [
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color("rgb(0, 255, 0)"),
+        roughness: 0.5,
+        metalness: 0.5
+    }),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color("rgb(255, 0, 0)"),
+        roughness: 0.5,
+        metalness: 0.5
+    })];
 let global_offset = new THREE.Vector3();
 
 init();
@@ -195,23 +207,23 @@ function initRender() {
     dLight.position.copy(camera.position);
     scene.add(dLight);
 
-    aLight = new THREE.AmbientLight(0xFFFFFF, 1.7);
+    aLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
     scene.add(aLight);
 
-    // controls = new THREE.TrackballControls(camera, renderer.domElement);
-    controls = new THREE.OrthographicTrackballControls(camera, renderer.domElement);
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    // controls = new THREE.OrthographicTrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = rotateSpeed;
     controls.zoomSpeed   = zoomSpeed;
     controls.addEventListener('change', render);
 
-    material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
+    material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors, roughness: 0.5, metalness: 0.5} );
 
     // add a fixed size object for a sense of scale
     var geom = new THREE.BoxGeometry(scaleObjectSize, scaleObjectSize, scaleObjectSize);
-    var mat  = new THREE.MeshStandardMaterial({color: 0x007bff});
+    var mat  = new THREE.MeshStandardMaterial({color: 0x007bff, roughness: 0.5, metalness: 0.5});
     var scaleObject = new THREE.Mesh(geom, mat);
     var wireframe = new THREE.WireframeGeometry(geom);
-    var line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({color: 'black'}));
+    var line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({color: 'black', linewidth: 2}));
     sdLight = new THREE.DirectionalLight(0xFFFFFF);
     sdLight.position.copy(camera.position);
     saLight = new THREE.AmbientLight(0xFFFFFF, 1.7);
@@ -226,8 +238,8 @@ function initRender() {
     scaleCamera.position.set(0, -0.16, 0.1);
     scaleCamera.lookAt(cameraTarget);
     scaleCamera.zoom = 2;
-    // scaleControls = new THREE.TrackballControls(scaleCamera, renderer.domElement);
-    scaleControls = new THREE.OrthographicTrackballControls(scaleCamera, renderer.domElement);
+    scaleControls = new THREE.TrackballControls(scaleCamera, renderer.domElement);
+    // scaleControls = new THREE.OrthographicTrackballControls(scaleCamera, renderer.domElement);
     scaleControls.rotateSpeed = rotateSpeed;
     scaleControls.zoomSpeed   = zoomSpeed;
     scaleControls.noPan = true;
