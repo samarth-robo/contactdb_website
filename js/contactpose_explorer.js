@@ -2,17 +2,35 @@ if ( WEBGL.isWebGLAvailable() === false ) {
     document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 }
 
-var camera, scene, renderer, controls, dLight, aLight, material, mesh, loader, meshName;
-var scaleScene, scaleCamera, Z0, scale, scaleInsetFrac = 0.25, scaleInsetSize, scaleControls;
-var sdLight, saLight;
-var scaleObjectSize = 0.01;
-const zoomSpeed = 1.2, rotateSpeed = 1.5;
-var rendererWidth, rendererHeight;
-var objectName='banana', sessionName='1', instruction='use';
-var datapoints;
-var thumbnailHeight = 40;
+// import {
+//     Group, Color, Vector3,
+//     MeshStandardMaterial,
+//     WebGL1Renderer,
+//     OrthographicCamera,
+//     Scene,
+//     Mesh,
+//     DirectionalLight, AmbientLight,
+//     BoxGeometry, WireframeGeometry, SphereGeometry, CylinderGeometry,
+//     LineSegments,
+// } from 'three';
+// 
+// import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
+// import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
+
+let camera, scaleCamera;
+let scene, scaleScene;
+let renderer, controls, scaleContols;
+let dLight, aLight, sdLight, saLight;
+let material, mesh, loader, meshName;
+let Z0, scale, scaleInsetSize;
+let rendererWidth, rendererHeight;
+let objectName='banana', sessionName='1', instruction='use';
+let datapoints;
 let hands = new THREE.Group();
-var DEV = true;
+let global_offset = new THREE.Vector3();
+const scaleObjectSize = 0.01, aLightStrength=1.2, scaleInsetFrac = 0.25, 
+    zoomSpeed = 1.2, rotateSpeed = 1.5, thumbnailHeight = 40,
+    joint_radius_m = 4e-3, bone_radius_m = 2.5e-3;
 const hand_line_ids = [
     [0, 1], [0, 5], [0, 9], [0, 13], [0, 17],
     [1, 2], [2, 3], [3, 4],
@@ -21,8 +39,6 @@ const hand_line_ids = [
     [13, 14], [14, 15], [15, 16],
     [17, 18], [18, 19], [19, 20],
 ]
-const joint_radius_m = 4e-3;
-const bone_radius_m = 2.5e-3;
 const bone_material = new THREE.MeshStandardMaterial({
     color: new THREE.Color("rgb(198, 134, 66)"),
     roughness: 0.5,
@@ -38,9 +54,20 @@ const joint_materials = [
         roughness: 0.5,
         metalness: 0.5
     })];
-let global_offset = new THREE.Vector3();
+const DEV = true;
 
-init();
+class App {
+    init() {
+        // read datapoints information and create dropdown menus
+        var datapointsName;
+        if (DEV) {
+            datapointsName = 'http://localhost:8000/debug_data/contactpose/datapoints.json'
+        } else {
+            datapointsName = './contactpose_data/datapoints.json';
+        }
+        $.getJSON(datapointsName, {}, createMenus);
+    }
+}
 
 // update the object names menu
 function updateObjectNames() {
@@ -207,7 +234,7 @@ function initRender() {
     dLight.position.copy(camera.position);
     scene.add(dLight);
 
-    aLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
+    aLight = new THREE.AmbientLight(0xFFFFFF, aLightStrength);
     scene.add(aLight);
 
     controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -226,7 +253,7 @@ function initRender() {
     var line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({color: 'black', linewidth: 2}));
     sdLight = new THREE.DirectionalLight(0xFFFFFF);
     sdLight.position.copy(camera.position);
-    saLight = new THREE.AmbientLight(0xFFFFFF, 1.7);
+    saLight = new THREE.AmbientLight(0xFFFFFF, aLightStrength);
     line.depthTest = false;
     scaleScene = new THREE.Scene();
     scaleScene.add(scaleObject);
@@ -248,19 +275,6 @@ function initRender() {
     // Z0 = controls.target.distanceTo(controls.object.position);
     Z0 = controls.object.zoom;
 }
-
-
-function init() {
-    // read datapoints information and create dropdown menus
-    var datapointsName;
-    if (DEV) {
-        datapointsName = 'http://localhost:8000/debug_data/contactpose/datapoints.json'
-    } else {
-        datapointsName = './contactpose_data/datapoints.json';
-    }
-    $.getJSON(datapointsName, {}, createMenus);
-}
-
 
 function loadGeometryAndHands(annotationsName, geometry) {
     onGeometryLoad(geometry);
@@ -417,3 +431,5 @@ function animate() {
     render();
     requestAnimationFrame( animate );
 }
+
+export { App }
