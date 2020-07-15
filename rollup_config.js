@@ -2,12 +2,12 @@ import resolve from '@rollup/plugin-node-resolve'; // locate and bundle dependen
 import { terser } from "rollup-plugin-terser"; // code minification (optional)
 
 export default {
-	input: 'src/main.js',
+	input: 'js/contactpose_explorer.js',
 	output: [
 		{
 			format: 'umd',
 			name: 'MYAPP',
-			file: 'build/bundle.js'
+			file: 'js/bundle.js'
 		}
 	],
 	plugins: [ resolve(), terser() ]

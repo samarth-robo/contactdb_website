@@ -1,7 +1,11 @@
 {
   "name": "contactpose",
   "version": "1.0.0",
-  "description": "https://contactpose.cc.gatech.edu",
+  "description": "ContactPose - ECCV 2020",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samarth-robo/contactdb_website/tree/contactpose"
+  },
   "main": "index.js",
   "scripts": {
     "build": "rollup -c \"rollup_config.js\"",

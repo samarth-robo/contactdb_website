@@ -2,32 +2,32 @@ if ( WEBGL.isWebGLAvailable() === false ) {
     document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 }
 
-// import {
-//     Group, Color, Vector3,
-//     MeshStandardMaterial,
-//     WebGL1Renderer,
-//     OrthographicCamera,
-//     Scene,
-//     Mesh,
-//     DirectionalLight, AmbientLight,
-//     BoxGeometry, WireframeGeometry, SphereGeometry, CylinderGeometry,
-//     LineSegments,
-// } from 'three';
-// 
-// import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-// import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
+import {
+    Group, Color, Vector3,
+    MeshStandardMaterial, LineBasicMaterial,
+    WebGLRenderer,
+    OrthographicCamera,
+    Scene,
+    Mesh,
+    DirectionalLight, AmbientLight,
+    BoxGeometry, WireframeGeometry, SphereGeometry, CylinderGeometry,
+    LineSegments, VertexColors,
+} from 'three';
+
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
+import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
 
 let camera, scaleCamera;
 let scene, scaleScene;
-let renderer, controls, scaleContols;
+let renderer, controls, scaleControls;
 let dLight, aLight, sdLight, saLight;
 let material, mesh, loader, meshName;
 let Z0, scale, scaleInsetSize;
 let rendererWidth, rendererHeight;
 let objectName='banana', sessionName='1', instruction='use';
 let datapoints;
-let hands = new THREE.Group();
-let global_offset = new THREE.Vector3();
+let hands = new Group();
+let global_offset = new Vector3();
 const scaleObjectSize = 0.01, aLightStrength=1.2, scaleInsetFrac = 0.25, 
     zoomSpeed = 1.2, rotateSpeed = 1.5, thumbnailHeight = 40,
     joint_radius_m = 4e-3, bone_radius_m = 2.5e-3;
@@ -39,18 +39,18 @@ const hand_line_ids = [
     [13, 14], [14, 15], [15, 16],
     [17, 18], [18, 19], [19, 20],
 ]
-const bone_material = new THREE.MeshStandardMaterial({
-    color: new THREE.Color("rgb(198, 134, 66)"),
+const bone_material = new MeshStandardMaterial({
+    color: new Color("rgb(198, 134, 66)"),
     roughness: 0.5,
     metalness: 0.5});
 const joint_materials = [
-    new THREE.MeshStandardMaterial({
-        color: new THREE.Color("rgb(0, 255, 0)"),
+    new MeshStandardMaterial({
+        color: new Color("rgb(0, 255, 0)"),
         roughness: 0.5,
         metalness: 0.5
     }),
-    new THREE.MeshStandardMaterial({
-        color: new THREE.Color("rgb(255, 0, 0)"),
+    new MeshStandardMaterial({
+        color: new Color("rgb(255, 0, 0)"),
         roughness: 0.5,
         metalness: 0.5
     })];
@@ -94,7 +94,7 @@ function updateObjectNames() {
         inp.value = o;
         inp.id = o + "Button";
         inp.autocomplete = "off";
-        inp.setAttribute("onchange", "objectNameChanged(this.value)");
+        inp.setAttribute("onchange", "MYAPP.objectNameChanged(this.value)");
         var label = document.createElement("label");
         label.className = "btn btn-outline-primary";
         label.setAttribute("data-toggle", "tooltip");
@@ -168,18 +168,21 @@ function updateInstructions() {
 
 function instructionChanged(value) {
     instruction = value;
+    console.log(sessionName + " : " + instruction + " : " + objectName);
     updateSessionNames();
     updateObjectNames();
     updateMesh();
 }
 function objectNameChanged(value) {
     objectName = value;
+    console.log(sessionName + " : " + instruction + " : " + objectName);
     updateInstructions();
     updateSessionNames();
     updateMesh();
 }
 function sessionNameChanged(value) {
     sessionName = value;
+    console.log(sessionName + " : " + instruction + " : " + objectName);
     updateInstructions();
     updateObjectNames();
     updateMesh();
@@ -195,7 +198,7 @@ function createMenus(jsondata) {
         });
     }
 
-    iMenu = document.getElementById('instructionsMenu');
+    var iMenu = document.getElementById('instructionsMenu');
     var idxSelected = 0;
     for (var instr in datapoints) {
         if (instr == instruction) {
@@ -212,61 +215,69 @@ function createMenus(jsondata) {
 
 
 function initRender() {
-    renderer = new THREE.WebGLRenderer( { antialias: true, canvas: document.querySelector("canvas") } );
+    renderer = new WebGLRenderer( { antialias: true, canvas: document.querySelector("canvas") } );
     renderer.autoClear = false;
     renderer.setScissorTest(true);
 
-    // camera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
-    camera = new THREE.OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
+    // camera = new PerspectiveCamera(60, 2, 0.01, 0.41);
+    camera = new OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
     camera.position.set(0, -0.16, 0.1);
     camera.zoom = 2;
-    var cameraTarget = new THREE.Vector3(0, 0, 0);
+    var cameraTarget = new Vector3(0, 0, 0);
     camera.lookAt(cameraTarget);
 
-    scene = new THREE.Scene();
+    scene = new Scene();
     scene.add(hands);
-    scene.background = new THREE.Color( 0xFFFFFF );
+    scene.background = new Color( 0xFFFFFF );
 
-    loader = new THREE.PLYLoader();
+    loader = new PLYLoader();
 
     // Lights
-    dLight = new THREE.DirectionalLight(0xFFFFFF);
+    dLight = new DirectionalLight(0xFFFFFF);
     dLight.position.copy(camera.position);
     scene.add(dLight);
 
-    aLight = new THREE.AmbientLight(0xFFFFFF, aLightStrength);
+    aLight = new AmbientLight(0xFFFFFF, aLightStrength);
     scene.add(aLight);
 
-    controls = new THREE.TrackballControls(camera, renderer.domElement);
-    // controls = new THREE.OrthographicTrackballControls(camera, renderer.domElement);
+    controls = new TrackballControls(camera, renderer.domElement);
+    // controls = new OrthographicTrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = rotateSpeed;
     controls.zoomSpeed   = zoomSpeed;
     controls.addEventListener('change', render);
 
-    material = new THREE.MeshStandardMaterial( { color: 'white', vertexColors: THREE.VertexColors, roughness: 0.5, metalness: 0.5} );
+    material = new MeshStandardMaterial( {
+        color: 'white',
+        vertexColors: VertexColors,
+        roughness: 0.5, metalness: 0.5} );
 
     // add a fixed size object for a sense of scale
-    var geom = new THREE.BoxGeometry(scaleObjectSize, scaleObjectSize, scaleObjectSize);
-    var mat  = new THREE.MeshStandardMaterial({color: 0x007bff, roughness: 0.5, metalness: 0.5});
-    var scaleObject = new THREE.Mesh(geom, mat);
-    var wireframe = new THREE.WireframeGeometry(geom);
-    var line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({color: 'black', linewidth: 2}));
-    sdLight = new THREE.DirectionalLight(0xFFFFFF);
+    var geom = new BoxGeometry(scaleObjectSize, scaleObjectSize, scaleObjectSize);
+    var mat  = new MeshStandardMaterial({
+        color: 0x007bff,
+        roughness: 0.5, metalness: 0.5
+    });
+    var scaleObject = new Mesh(geom, mat);
+    var wireframe = new WireframeGeometry(geom);
+    var line = new LineSegments(wireframe, new LineBasicMaterial({
+        color: 'black', linewidth: 2
+    }));
+    sdLight = new DirectionalLight(0xFFFFFF);
     sdLight.position.copy(camera.position);
-    saLight = new THREE.AmbientLight(0xFFFFFF, aLightStrength);
+    saLight = new AmbientLight(0xFFFFFF, aLightStrength);
     line.depthTest = false;
-    scaleScene = new THREE.Scene();
+    scaleScene = new Scene();
     scaleScene.add(scaleObject);
     scaleScene.add(line);
     scaleScene.add(sdLight);
     scaleScene.add(saLight);
-    // scaleCamera = new THREE.PerspectiveCamera(60, 2, 0.01, 0.41);
-    scaleCamera = new THREE.OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
+    // scaleCamera = new PerspectiveCamera(60, 2, 0.01, 0.41);
+    scaleCamera = new OrthographicCamera(-0.2, 0.2, 0.2, -0.2, 0.01, 0.41);
     scaleCamera.position.set(0, -0.16, 0.1);
     scaleCamera.lookAt(cameraTarget);
     scaleCamera.zoom = 2;
-    scaleControls = new THREE.TrackballControls(scaleCamera, renderer.domElement);
-    // scaleControls = new THREE.OrthographicTrackballControls(scaleCamera, renderer.domElement);
+    scaleControls = new TrackballControls(scaleCamera, renderer.domElement);
+    // scaleControls = new OrthographicTrackballControls(scaleCamera, renderer.domElement);
     scaleControls.rotateSpeed = rotateSpeed;
     scaleControls.zoomSpeed   = zoomSpeed;
     scaleControls.noPan = true;
@@ -314,7 +325,7 @@ function onGeometryLoad ( geometry ) {
     geometry.computeVertexNormals();
 
     if (mesh == null) {
-        mesh = new THREE.Mesh( geometry, material );
+        mesh = new Mesh( geometry, material );
         mesh.name = 'object';
         scene.add(mesh);
     } else {
@@ -340,16 +351,16 @@ function createHands(annotations) {
         if (!hand['valid']) return;
         // apply all offsets, transforms etc.
         const hand_joints = hand['joints'].map(function(joint) {
-            const j = new THREE.Vector3(...joint);
-            let v = new THREE.Vector3();
+            const j = new Vector3(...joint);
+            let v = new Vector3();
             v.subVectors(j, global_offset);
             return v;
         })
         // create new joint spheres
         hand_joints.forEach(function(joint, joint_idx) {
-            let geom = new THREE.SphereGeometry(radius=joint_radius_m);
+            let geom = new SphereGeometry(joint_radius_m);
             geom.translate(...joint.toArray());
-            let m = new THREE.Mesh(geom, joint_materials[hand_idx]);
+            let m = new Mesh(geom, joint_materials[hand_idx]);
             m.name = 'joint_' + hand_idx + '_' + joint_idx;
             hands.add(m);
         });
@@ -359,14 +370,14 @@ function createHands(annotations) {
             const jidx1 = joint_idxs[1];
             const j0 = hand_joints[jidx0];
             const j1 = hand_joints[jidx1];
-            let v = new THREE.Vector3();
+            let v = new Vector3();
             v.subVectors(j1, j0);
-            let geom = new THREE.CylinderGeometry(bone_radius_m, bone_radius_m,
+            let geom = new CylinderGeometry(bone_radius_m, bone_radius_m,
                 v.length());
             geom.translate(0, geom.parameters.height/2.0, 0);
-            let m = new THREE.Mesh(geom, bone_material);
+            let m = new Mesh(geom, bone_material);
             m.name = 'bone_' + hand_idx + '_' + jidx0 + '_' + jidx1;
-            m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0),
+            m.quaternion.setFromUnitVectors(new Vector3(0, 1, 0),
                 v.normalize());
             m.position.set(...hand_joints[jidx0].toArray());
             hands.add(m);
@@ -393,7 +404,8 @@ function resizeCanvasToDisplaySize() {
         scaleInsetSize = Math.round(scaleInsetFrac * Math.min(rendererWidth, rendererHeight));
         var x = Math.round((rendererWidth-scaleInsetSize)/2.0);
         var y = Math.round((rendererHeight-scaleInsetSize)/2.0);
-        scaleCamera.setViewOffset(rendererWidth, rendererHeight, x, y, scaleInsetSize, scaleInsetSize);
+        scaleCamera.setViewOffset(rendererWidth, rendererHeight, x, y,
+            scaleInsetSize, scaleInsetSize);
         scaleCamera.left = -aspect * scaleCamera.top;
         scaleCamera.right = aspect * scaleCamera.top;
         scaleCamera.updateProjectionMatrix();
@@ -409,8 +421,8 @@ function render() {
 
     renderer.clearDepth();
     sdLight.position.copy(scaleCamera.position);
-    x = rendererWidth - scaleInsetSize;
-    y = rendererHeight - scaleInsetSize;
+    let x = rendererWidth - scaleInsetSize;
+    let y = rendererHeight - scaleInsetSize;
     renderer.setViewport(x, y, scaleInsetSize, scaleInsetSize);
     renderer.setScissor(x, y, scaleInsetSize, scaleInsetSize);
     renderer.render(scaleScene, scaleCamera);
@@ -425,11 +437,11 @@ function animate() {
     // scale = Z1 / Z0 * scaleObjectSize;
     const Z1 = controls.object.zoom;
     scale = Z0 / Z1 * scaleObjectSize;
-    var dispScale = document.getElementById("displayScale");
+    let dispScale = document.getElementById("displayScale");
     dispScale.innerHTML = "Cube Size: " + (scale*100).toFixed(1) + " cm";
     // console.log(scale);
     render();
     requestAnimationFrame( animate );
 }
 
-export { App }
+export { App, instructionChanged, objectNameChanged, sessionNameChanged }
