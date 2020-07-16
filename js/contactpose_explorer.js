@@ -354,7 +354,7 @@ function onGeometryLoad (geometry, textureName) {
 
 
 function clearHands() {
-    for (geom of hands.children) {
+    for (let geom of hands.children) {
         geom.parent.remove(geom);
         geom.geometry.dispose();
     }
