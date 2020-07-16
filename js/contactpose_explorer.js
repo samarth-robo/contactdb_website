@@ -28,11 +28,12 @@ let rendererWidth, rendererHeight;
 let textureName;
 let datapoints;
 
-let objectName='cell_phone', sessionName='28', instruction='use';
+let objectName='camera', sessionName='28', instruction='use';
 let mesh = new Mesh();
 let hands = new Group();
 let global_offset = new Vector3();
 let loader = new GLTFLoader(), textureLoader = new TextureLoader();
+let geometryLoaded = false, textureLoaded = false;
 
 const scaleObjectSize = 0.01, aLightStrength=1.2, scaleInsetFrac = 0.25, 
     zoomSpeed = 1.2, rotateSpeed = 1.5, thumbnailHeight = 40,
@@ -304,29 +305,18 @@ function updateMesh() {
             '_' + instruction + '_' + objectName + '.json';
     }
     if (newTextureName != textureName) {
-        var dispStatus = document.getElementById("displayStatus");
-        dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         textureName = newTextureName;
-        var cb = loadGeometryAndHands.bind(null, newAnnotationsName);
-        loader.load(newMeshName, cb);
+       
+        geometryLoaded = false;
+        textureLoaded = false;
+        document.getElementById("displayStatus").innerHTML = "Loading: <font color='red'>geometry, texture</font>";
+        
+        loader.load(newMeshName, onGeometryLoad);
         textureLoader.load(newTextureName, onTextureLoad);
-    }
-}
-
-
-function loadGeometryAndHands(annotationsName, gltf) {
-    var geometry = new BufferGeometry();
-    gltf.scene.traverse(function(child) {
-        if (child.geometry != undefined) {
-            geometry = child.geometry;
+        if (objectName != 'palm_print') {  // palm_print does not have joint annotations
+            $.getJSON(newAnnotationsName, {}, createHands);
         }
-    });
-    geometry.scale(1e-3, 1e-3, 1e-3);  // three.js r118 does not read scale
-    clearHands();
-    if (objectName != 'palm_print') {  // palm_print does not have joint annotations
-        $.getJSON(annotationsName, {}, createHands);
     }
-    onGeometryLoad(geometry);
 }
 
 
@@ -336,37 +326,50 @@ function onTextureLoad (texture) {
     let material = new MeshStandardMaterial( {
         color: 'white',
         map: texture,
-        roughness: 0.5, metalness: 0.5} );
+        roughness: 0.5, metalness: 0.5
+    });
 
     mesh.material.dispose();
     mesh.material = material;
+    textureLoaded = true;
+    var status;
+    if (geometryLoaded) {
+        status = "<font color='green'>Loaded</font>";
+    } else {
+        status = "Loading: <font color='red'>geometry</font>" 
+    }
+    document.getElementById("displayStatus").innerHTML = status;
 }
 
 
-function onGeometryLoad (geometry) {
+function onGeometryLoad (gltf) {
+    let geometry = new BufferGeometry();
+    gltf.scene.traverse(function(child) {
+        if (child.geometry != undefined) {
+            geometry = child.geometry;
+        }
+    });
+    geometry.scale(1e-3, 1e-3, 1e-3);  // three.js r118 does not read scale
     geometry.computeBoundingBox();
     geometry.boundingBox.getCenter(global_offset);
     geometry.center();
     geometry.computeFaceNormals();
     geometry.computeVertexNormals();
-
     mesh.geometry.dispose();
     mesh.geometry = geometry;
-    var dispStatus = document.getElementById("displayStatus");
-    dispStatus.innerHTML = "Status: Loaded <font color='green'>" + objectName + ", " + instruction + ", #" + sessionName + "</font>";
-}
-
-
-function clearHands() {
-    for (let geom of hands.children) {
-        geom.parent.remove(geom);
-        geom.geometry.dispose();
+    geometryLoaded = true;
+    var status;
+    if (textureLoaded) {
+        status = "<font color='green'>Loaded</font>";
+    } else {
+        status = "Loading: <font color='red'>texture</font>" 
     }
-    hands.children.length = 0;
+    document.getElementById("displayStatus").innerHTML = status;
 }
 
 
 function createHands(annotations) {
+    clearHands();
     annotations['hands'].forEach(function(hand, hand_idx) {
         if (!hand['valid']) return;
         // apply all offsets, transforms etc.
@@ -403,6 +406,25 @@ function createHands(annotations) {
             hands.add(m);
         })
     });
+}
+
+
+function clearHands() {
+    for (let geom of hands.children) {
+        geom.parent.remove(geom);
+        geom.geometry.dispose();
+    }
+    hands.children.length = 0;
+}
+
+
+function finalizeLoading() {
+    while (!(geometryLoaded && handsCreated && textureLoaded)) {
+        continue;
+    }
+    debugger;
+
+
 }
 
 
