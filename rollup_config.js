@@ -11,4 +11,5 @@ export default {
 		}
 	],
 	plugins: [ resolve(), terser() ]
+	// plugins: [ resolve(), ]
 };

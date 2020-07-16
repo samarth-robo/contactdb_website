@@ -8,20 +8,22 @@ import {
     WebGLRenderer,
     OrthographicCamera,
     Scene,
-    Mesh,
     DirectionalLight, AmbientLight,
-    BoxGeometry, WireframeGeometry, SphereGeometry, CylinderGeometry,
-    LineSegments, VertexColors,
+    Mesh,
+    BoxGeometry, WireframeGeometry, SphereGeometry, CylinderGeometry, BufferGeometry,
+    LineSegments,
+    TextureLoader,
+    sRGBEncoding,
 } from 'three';
 
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 let camera, scaleCamera;
 let scene, scaleScene;
 let renderer, controls, scaleControls;
 let dLight, aLight, sdLight, saLight;
-let material, mesh, loader, meshName;
+let mesh, loader, meshName, textureLoader;
 let Z0, scale, scaleInsetSize;
 let rendererWidth, rendererHeight;
 let objectName='banana', sessionName='1', instruction='use';
@@ -54,7 +56,7 @@ const joint_materials = [
         roughness: 0.5,
         metalness: 0.5
     })];
-const DEV = true;
+const DEV = false;
 
 class App {
     init() {
@@ -215,8 +217,12 @@ function createMenus(jsondata) {
 
 
 function initRender() {
-    renderer = new WebGLRenderer( { antialias: true, canvas: document.querySelector("canvas") } );
+    renderer = new WebGLRenderer({
+        antialias: true,
+        canvas: document.querySelector("canvas")
+    });
     renderer.autoClear = false;
+    renderer.outputEncoding = sRGBEncoding;
     renderer.setScissorTest(true);
 
     // camera = new PerspectiveCamera(60, 2, 0.01, 0.41);
@@ -230,7 +236,7 @@ function initRender() {
     scene.add(hands);
     scene.background = new Color( 0xFFFFFF );
 
-    loader = new PLYLoader();
+    loader = new GLTFLoader();
 
     // Lights
     dLight = new DirectionalLight(0xFFFFFF);
@@ -241,15 +247,9 @@ function initRender() {
     scene.add(aLight);
 
     controls = new TrackballControls(camera, renderer.domElement);
-    // controls = new OrthographicTrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = rotateSpeed;
     controls.zoomSpeed   = zoomSpeed;
     controls.addEventListener('change', render);
-
-    material = new MeshStandardMaterial( {
-        color: 'white',
-        vertexColors: VertexColors,
-        roughness: 0.5, metalness: 0.5} );
 
     // add a fixed size object for a sense of scale
     var geom = new BoxGeometry(scaleObjectSize, scaleObjectSize, scaleObjectSize);
@@ -277,7 +277,6 @@ function initRender() {
     scaleCamera.lookAt(cameraTarget);
     scaleCamera.zoom = 2;
     scaleControls = new TrackballControls(scaleCamera, renderer.domElement);
-    // scaleControls = new OrthographicTrackballControls(scaleCamera, renderer.domElement);
     scaleControls.rotateSpeed = rotateSpeed;
     scaleControls.zoomSpeed   = zoomSpeed;
     scaleControls.noPan = true;
@@ -287,23 +286,16 @@ function initRender() {
     Z0 = controls.object.zoom;
 }
 
-function loadGeometryAndHands(annotationsName, geometry) {
-    onGeometryLoad(geometry);
-    clearHands();
-    if (objectName != 'palm_print') {  // palm_print does not have joint annotations
-        $.getJSON(annotationsName, {}, createHands);
-    }
-}
-
-
 function updateMesh() {
-    var newMeshName, newAnnotationsName;
+    var newMeshName, newAnnotationsName, newTextureName;
     if (DEV) {
-        newMeshName = 'http://localhost:8000/debug_data/contactpose/full39_use_ps_controller.ply'
-        newAnnotationsName = 'http://localhost:8000/debug_data/contactpose/full39_use_ps_controller.json'
+        newMeshName = 'http://localhost:8000/debug_data/contactpose/camera.glb';
+        newTextureName = 'http://localhost:8000/debug_data/contactpose/full1_use_camera.png';
+        newAnnotationsName = 'http://localhost:8000/debug_data/contactpose/full1_use_camera.json';
     } else {
-        newMeshName = './contactpose_data/meshes/full' + sessionName + '_' + 
-            instruction + '_' + objectName + '.ply';
+        newMeshName = './contactpose_data/meshes/' + objectName + '.glb';
+        newTextureName = './contactpose_data/textures/full' + sessionName +
+            '_' + instruction + '_' + objectName + '.png';
         newAnnotationsName = './contactpose_data/annotations/full' + sessionName +
             '_' + instruction + '_' + objectName + '.json';
     }
@@ -311,18 +303,42 @@ function updateMesh() {
         var dispStatus = document.getElementById("displayStatus");
         dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         meshName = newMeshName;
-        var cb = loadGeometryAndHands.bind(null, newAnnotationsName);
+        var cb = loadGeometryAndHands.bind(null, newAnnotationsName,
+            newTextureName);
         loader.load(meshName, cb);
     }
 }
 
 
-function onGeometryLoad ( geometry ) {
+function loadGeometryAndHands(annotationsName, textureName, gltf) {
+    var geometry = new BufferGeometry();
+    gltf.scene.traverse(function(child) {
+        if (child.geometry != undefined) {
+            geometry = child.geometry;
+        }
+    });
+    geometry.scale(1e-3, 1e-3, 1e-3);  // three.js r118 does not read scale
+    onGeometryLoad(geometry, textureName);
+    clearHands();
+    if (objectName != 'palm_print') {  // palm_print does not have joint annotations
+        $.getJSON(annotationsName, {}, createHands);
+    }
+}
+
+function onGeometryLoad (geometry, textureName) {
     geometry.computeBoundingBox();
     geometry.boundingBox.getCenter(global_offset);
     geometry.center();
     geometry.computeFaceNormals();
     geometry.computeVertexNormals();
+
+    let texture = new TextureLoader().load(textureName);
+    texture.encoding = sRGBEncoding;
+    texture.flipY = false;
+    let material = new MeshStandardMaterial( {
+        color: 'white',
+        map: texture,
+        roughness: 0.5, metalness: 0.5} );
 
     if (mesh == null) {
         mesh = new Mesh( geometry, material );
