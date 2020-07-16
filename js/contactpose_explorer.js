@@ -26,7 +26,7 @@ let dLight, aLight, sdLight, saLight;
 let mesh, loader, meshName, textureLoader;
 let Z0, scale, scaleInsetSize;
 let rendererWidth, rendererHeight;
-let objectName='banana', sessionName='1', instruction='use';
+let objectName='camera', sessionName='28', instruction='use';
 let datapoints;
 let hands = new Group();
 let global_offset = new Vector3();
