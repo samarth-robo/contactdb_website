@@ -358,6 +358,8 @@ function onGeometryLoad (annotationsName, gltf) {
     // hands need to be loaded after geometry, since they need global_offset
     if (objectName != 'palm_print') {  // palm_print does not have joint annotations
         $.getJSON(annotationsName, {}, createHands);
+    } else {
+        clearHands();
     }
     geometryLoaded = true;
     var status;
@@ -417,16 +419,6 @@ function clearHands() {
         geom.geometry.dispose();
     }
     hands.children.length = 0;
-}
-
-
-function finalizeLoading() {
-    while (!(geometryLoaded && handsCreated && textureLoaded)) {
-        continue;
-    }
-    debugger;
-
-
 }
 
 
