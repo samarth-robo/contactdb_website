@@ -147,5 +147,3 @@ fabric.properties
 meshes
 node_modules
 datapoints.json
-contactpose_data
-contactdb_data
