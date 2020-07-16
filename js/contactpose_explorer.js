@@ -311,11 +311,9 @@ function updateMesh() {
         textureLoaded = false;
         document.getElementById("displayStatus").innerHTML = "Loading: <font color='red'>geometry, texture</font>";
         
-        loader.load(newMeshName, onGeometryLoad);
+        let cb = onGeometryLoad.bind(null, newAnnotationsName);
+        loader.load(newMeshName, cb);
         textureLoader.load(newTextureName, onTextureLoad);
-        if (objectName != 'palm_print') {  // palm_print does not have joint annotations
-            $.getJSON(newAnnotationsName, {}, createHands);
-        }
     }
 }
 
@@ -342,7 +340,7 @@ function onTextureLoad (texture) {
 }
 
 
-function onGeometryLoad (gltf) {
+function onGeometryLoad (annotationsName, gltf) {
     let geometry = new BufferGeometry();
     gltf.scene.traverse(function(child) {
         if (child.geometry != undefined) {
@@ -357,6 +355,10 @@ function onGeometryLoad (gltf) {
     geometry.computeVertexNormals();
     mesh.geometry.dispose();
     mesh.geometry = geometry;
+    // hands need to be loaded after geometry, since they need global_offset
+    if (objectName != 'palm_print') {  // palm_print does not have joint annotations
+        $.getJSON(annotationsName, {}, createHands);
+    }
     geometryLoaded = true;
     var status;
     if (textureLoaded) {
