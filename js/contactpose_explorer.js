@@ -23,14 +23,17 @@ let camera, scaleCamera;
 let scene, scaleScene;
 let renderer, controls, scaleControls;
 let dLight, aLight, sdLight, saLight;
-let mesh = new Mesh(), meshName;
 let Z0, scale, scaleInsetSize;
 let rendererWidth, rendererHeight;
-let objectName='cell_phone', sessionName='28', instruction='use';
+let textureName;
 let datapoints;
+
+let objectName='cell_phone', sessionName='28', instruction='use';
+let mesh = new Mesh();
 let hands = new Group();
 let global_offset = new Vector3();
 let loader = new GLTFLoader(), textureLoader = new TextureLoader();
+
 const scaleObjectSize = 0.01, aLightStrength=1.2, scaleInsetFrac = 0.25, 
     zoomSpeed = 1.2, rotateSpeed = 1.5, thumbnailHeight = 40,
     joint_radius_m = 4e-3, bone_radius_m = 2.5e-3;
@@ -300,12 +303,12 @@ function updateMesh() {
         newAnnotationsName = './contactpose_data/annotations/full' + sessionName +
             '_' + instruction + '_' + objectName + '.json';
     }
-    if (newMeshName != meshName) {
+    if (newTextureName != textureName) {
         var dispStatus = document.getElementById("displayStatus");
         dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
-        meshName = newMeshName;
+        textureName = newTextureName;
         var cb = loadGeometryAndHands.bind(null, newAnnotationsName);
-        loader.load(meshName, cb);
+        loader.load(newMeshName, cb);
         textureLoader.load(newTextureName, onTextureLoad);
     }
 }
