@@ -23,13 +23,14 @@ let camera, scaleCamera;
 let scene, scaleScene;
 let renderer, controls, scaleControls;
 let dLight, aLight, sdLight, saLight;
-let mesh, loader, meshName, textureLoader;
+let mesh = new Mesh(), meshName;
 let Z0, scale, scaleInsetSize;
 let rendererWidth, rendererHeight;
-let objectName='camera', sessionName='28', instruction='use';
+let objectName='cell_phone', sessionName='28', instruction='use';
 let datapoints;
 let hands = new Group();
 let global_offset = new Vector3();
+let loader = new GLTFLoader(), textureLoader = new TextureLoader();
 const scaleObjectSize = 0.01, aLightStrength=1.2, scaleInsetFrac = 0.25, 
     zoomSpeed = 1.2, rotateSpeed = 1.5, thumbnailHeight = 40,
     joint_radius_m = 4e-3, bone_radius_m = 2.5e-3;
@@ -234,9 +235,9 @@ function initRender() {
 
     scene = new Scene();
     scene.add(hands);
+    mesh.name = 'object';
+    scene.add(mesh);
     scene.background = new Color( 0xFFFFFF );
-
-    loader = new GLTFLoader();
 
     // Lights
     dLight = new DirectionalLight(0xFFFFFF);
@@ -303,14 +304,14 @@ function updateMesh() {
         var dispStatus = document.getElementById("displayStatus");
         dispStatus.innerHTML = "Status: <font color='red'>Loading</font>";
         meshName = newMeshName;
-        var cb = loadGeometryAndHands.bind(null, newAnnotationsName,
-            newTextureName);
+        var cb = loadGeometryAndHands.bind(null, newAnnotationsName);
         loader.load(meshName, cb);
+        textureLoader.load(newTextureName, onTextureLoad);
     }
 }
 
 
-function loadGeometryAndHands(annotationsName, textureName, gltf) {
+function loadGeometryAndHands(annotationsName, gltf) {
     var geometry = new BufferGeometry();
     gltf.scene.traverse(function(child) {
         if (child.geometry != undefined) {
@@ -318,21 +319,15 @@ function loadGeometryAndHands(annotationsName, textureName, gltf) {
         }
     });
     geometry.scale(1e-3, 1e-3, 1e-3);  // three.js r118 does not read scale
-    onGeometryLoad(geometry, textureName);
     clearHands();
     if (objectName != 'palm_print') {  // palm_print does not have joint annotations
         $.getJSON(annotationsName, {}, createHands);
     }
+    onGeometryLoad(geometry);
 }
 
-function onGeometryLoad (geometry, textureName) {
-    geometry.computeBoundingBox();
-    geometry.boundingBox.getCenter(global_offset);
-    geometry.center();
-    geometry.computeFaceNormals();
-    geometry.computeVertexNormals();
 
-    let texture = new TextureLoader().load(textureName);
+function onTextureLoad (texture) {
     texture.encoding = sRGBEncoding;
     texture.flipY = false;
     let material = new MeshStandardMaterial( {
@@ -340,14 +335,20 @@ function onGeometryLoad (geometry, textureName) {
         map: texture,
         roughness: 0.5, metalness: 0.5} );
 
-    if (mesh == null) {
-        mesh = new Mesh( geometry, material );
-        mesh.name = 'object';
-        scene.add(mesh);
-    } else {
-        mesh.geometry.dispose();
-        mesh.geometry = geometry;
-    }
+    mesh.material.dispose();
+    mesh.material = material;
+}
+
+
+function onGeometryLoad (geometry) {
+    geometry.computeBoundingBox();
+    geometry.boundingBox.getCenter(global_offset);
+    geometry.center();
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+
+    mesh.geometry.dispose();
+    mesh.geometry = geometry;
     var dispStatus = document.getElementById("displayStatus");
     dispStatus.innerHTML = "Status: Loaded <font color='green'>" + objectName + ", " + instruction + ", #" + sessionName + "</font>";
 }
