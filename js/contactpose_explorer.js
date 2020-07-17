@@ -61,7 +61,7 @@ const joint_materials = [
         roughness: 0.5,
         metalness: 0.5
     })];
-const DEV = false;
+const DEV = true;
 
 class App {
     init() {
@@ -292,28 +292,47 @@ function initRender() {
 }
 
 function updateMesh() {
-    var newMeshName, newAnnotationsName, newTextureName;
+    var newMeshName, newAnnotationsName, newTextureName, newImageTemplate, defaultImageName;
     if (DEV) {
         newMeshName = 'http://localhost:8000/debug_data/contactpose/camera.glb';
-        newTextureName = 'http://localhost:8000/debug_data/contactpose/full1_use_camera.png';
-        newAnnotationsName = 'http://localhost:8000/debug_data/contactpose/full1_use_camera.json';
+        newTextureName =
+            'http://localhost:8000/debug_data/contactpose/full1_use_camera.png';
+        newAnnotationsName =
+            'http://localhost:8000/debug_data/contactpose/full1_use_camera.json';
+        newImageTemplate =
+            'http://localhost:8000/debug_data/contactpose/full1_use_camera_kinect2_cdir.png';
+        defaultImageName =
+            'http://localhost:8000/debug_data/contactpose/default_image.png';
     } else {
         newMeshName = './contactpose_data/meshes/' + objectName + '.glb';
         newTextureName = './contactpose_data/textures/full' + sessionName +
             '_' + instruction + '_' + objectName + '.png';
         newAnnotationsName = './contactpose_data/annotations/full' + sessionName +
             '_' + instruction + '_' + objectName + '.json';
+        newImageTemplate = './contactpose_data/example_images/full' +
+            sessionName + '_' + instruction + '_' + objectName +
+            '_kinect2_cdir.png'; 
+        defaultImageName = './contactpose_data/example_images/default_image.png';
     }
     if (newTextureName != textureName) {
         textureName = newTextureName;
        
         geometryLoaded = false;
         textureLoaded = false;
-        document.getElementById("displayStatus").innerHTML = "Loading: <font color='red'>geometry, texture</font>";
+        document.getElementById("displayStatus").innerHTML = 
+            "Loading: <font color='red'>geometry, texture</font>";
         
         let cb = onGeometryLoad.bind(null, newAnnotationsName);
         loader.load(newMeshName, cb);
         textureLoader.load(newTextureName, onTextureLoad);
+
+        let imgText = '" class="figure-img img-fluid" onerror="this.onerror=null;this.src=\'' + defaultImageName + '\';">';
+        document.getElementById('leftImageArea').innerHTML = '<img src="' +
+            newImageTemplate.replace('cdir', 'left') + imgText;
+        document.getElementById('middleImageArea').innerHTML = '<img src="' +
+            newImageTemplate.replace('cdir', 'middle') + imgText;
+        document.getElementById('rightImageArea').innerHTML = '<img src="' +
+            newImageTemplate.replace('cdir', 'right') + imgText;
     }
 }
 
