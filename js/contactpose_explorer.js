@@ -61,7 +61,7 @@ const joint_materials = [
         roughness: 0.5,
         metalness: 0.5
     })];
-const DEV = true;
+const DEV = false;
 
 class App {
     init() {
