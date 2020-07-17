@@ -302,7 +302,7 @@ function updateMesh() {
         newImageTemplate =
             'http://localhost:8000/debug_data/contactpose/full1_use_camera_kinect2_cdir.png';
         defaultImageName =
-            'http://localhost:8000/debug_data/contactpose/default_image.png';
+            'http://localhost:8000/debug_data/contactpose/default_image.svg';
     } else {
         newMeshName = './contactpose_data/meshes/' + objectName + '.glb';
         newTextureName = './contactpose_data/textures/full' + sessionName +
@@ -312,7 +312,7 @@ function updateMesh() {
         newImageTemplate = './contactpose_data/example_images/full' +
             sessionName + '_' + instruction + '_' + objectName +
             '_kinect2_cdir.png'; 
-        defaultImageName = './contactpose_data/example_images/default_image.png';
+        defaultImageName = './contactpose_data/example_images/default_image.svg';
     }
     if (newTextureName != textureName) {
         textureName = newTextureName;
