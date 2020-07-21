@@ -1,6 +1,6 @@
-# ContactDB: Analyzing and Predicting Grasp Contact via Thermal Imaging
+# ContactPose: A Dataset of Grasps with Object Contact and Hand Pose
 
-Code for the website that allows exploring the ContactDB dataset. Website is hosted at https://contactdb.cc.gatech.edu.
+Code for the website that allows exploring the ContactPose dataset. Website is hosted at https://contactpose.cc.gatech.edu.
 
 1. Install [npm](https://www.npmjs.com)
 2. Install rollup for bundling the JS: `npm install --global rollup`
