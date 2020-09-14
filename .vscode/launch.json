@@ -4,11 +4,18 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "chrome",
             "request": "launch",
             "name": "Launch contactdb_explorer.html",
             "url": "http://localhost:8000/contactdb_explorer.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch index.html",
+            "url": "http://localhost:8000/index.html"
         },
         {
             "name": "Simple HTTP Server",
@@ -23,6 +30,10 @@
         {
             "name": "Debug contactdb_explorer.html",
             "configurations": ["Simple HTTP Server", "Launch contactdb_explorer.html"]
+        },
+        {
+            "name": "Debug index.html",
+            "configurations": ["Simple HTTP Server", "Launch index.html"]
         },
     ]
 }
